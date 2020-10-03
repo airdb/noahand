@@ -5,7 +5,7 @@ import "runtime"
 func GetPluginPath() string{
 	switch runtime.GOOS {
 	case "linux":
-		return "/noah/plugins/"
+		return "/srv/noah/plugins/"
 	case "darwin":
 		return "./plugins/"
 	}
