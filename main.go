@@ -16,9 +16,11 @@ limitations under the License.
 package main
 
 import (
-	"github.com/airdb/noah/cmd"
+	"github.com/airdb/noah/noahmain"
 )
 
 func main() {
-	cmd.Execute()
+	noahmain.RunCaddyServer()
+	return
+	// cmd.Execute()
 }

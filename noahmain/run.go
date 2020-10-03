@@ -1,6 +1,7 @@
 package noahmain
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -9,6 +10,14 @@ import (
 )
 
 func Run() {
+	go Heartbeat()
+
+	for {
+		fmt.Println("run plugin...")
+	}
+}
+
+func Heartbeat() {
 	for {
 		// rand.Seed(900)
 		maxSleepInterval := 60
