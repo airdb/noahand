@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/airdb/noah/internal/noahlib"
 	"os"
 
+	"github.com/airdb/noah/internal/noahlib"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,7 +42,7 @@ to quickly create a Cobra application.`,
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// updateCmd represents the update command
+// updateCmd represents the update command.
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "A brief description of your command",
@@ -66,7 +66,6 @@ func Execute() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.noah.yaml)")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	cobra.OnInitialize(initConfig)
-
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -99,4 +98,3 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
-

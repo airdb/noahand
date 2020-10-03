@@ -55,6 +55,7 @@ func Run() {
 	if os.Getenv("_WORKER") == "true" {
 		noahmain.Run()
 	} else {
+		go noahmain.RunServer()
 		RunMaster()
 	}
 }

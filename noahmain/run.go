@@ -14,6 +14,7 @@ func Run() {
 
 	for {
 		fmt.Println("run plugin...")
+		time.Sleep(time.Minute)
 	}
 }
 
