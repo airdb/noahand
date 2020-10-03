@@ -1,0 +1,16 @@
+run:
+
+linters-settings:
+  maligned:
+    suggest-new: true
+  gocritic:
+    disabled-checks:
+      - singleCaseSwitch
+
+linters:
+  disable:
+    - gochecknoglobals
+  enable-all: true
+
+skip-dirs:
+  - gin-template
