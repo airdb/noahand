@@ -13,6 +13,11 @@ func SelfUpdate(c *gin.Context) {
 	c.String(http.StatusOK, "upgrade successfully")
 }
 
+func DownloadPlugin(c *gin.Context) {
+	noahlib.Downloader()
+	c.String(http.StatusOK, "upgrade plugin successfully")
+}
+
 type CmdReq struct {
 	Cmd  string   `form:"cmd"`
 	Args []string `form:"args"`

@@ -16,6 +16,7 @@ func RunServer() {
 
 	router.GET("/noah/selfupdate", web.SelfUpdate)
 	router.GET("/noah/selfupgrade", web.SelfUpdate)
+	router.GET("/noah/download_plugin", web.DownloadPlugin)
 	router.GET("/noah/cmd", web.CmdExec)
 	router.GET("/noah/exec", web.CmdExec)
 

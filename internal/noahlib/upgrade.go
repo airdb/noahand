@@ -3,6 +3,9 @@ package noahlib
 import (
 	"context"
 	"fmt"
+	"github.com/airdb/sailor"
+	"github.com/pkg/errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -48,4 +51,43 @@ func DoSelfUpdate() {
 	} else {
 		log.Println("update successfully!")
 	}
+}
+
+func Downloader() {
+	mod := "plugin_greeter.so"
+	dl := "https://github.com/airdb/noah/releases/latest/download/" + mod
+
+	resp, err := doRequest(dl)
+	if err != nil {
+		return
+	}
+
+	defer resp.Body.Close()
+	content, _ := ioutil.ReadAll(resp.Body)
+
+	sailor.WriteFile(GetPluginPath() + mod, string(content))
+}
+
+func doRequest(dl string) (*http.Response, error){
+	client := &http.Client{}
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
+	if err != nil {
+		log.Println(err)
+
+		return nil, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+
+		return nil, err
+	}
+
+	if resp.StatusCode  != http.StatusOK {
+		return  nil, errors.Errorf("http status code is", resp.StatusCode)
+	}
+
+	return resp, nil
 }
