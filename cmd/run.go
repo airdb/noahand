@@ -60,19 +60,48 @@ func Run() {
 	}
 }
 
-func RunMaster() {
-	// Reap all children worker with no control or feedback.
-	go reap.ReapChildren(nil, nil, nil, nil)
+func waitForSignals(pids []int) {
+	sigchan := make(chan os.Signal, 1)
+	// signal.Notify(sigchan, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+	signal.Notify(sigchan, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGUSR2, syscall.SIGINT, syscall.SIGQUIT)
 
-	var pids []int
+	for range sigchan {
+		s := <-sigchan
+		log.Printf("%v signal received.\n", s)
 
-	// Ensure all subprocesses are killed.
-	go func() {
-		sigchan := make(chan os.Signal, 1)
-		signal.Notify(sigchan, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+		for _, pid := range pids {
+			switch s {
+			case syscall.SIGHUP:
+				log.Println("SIGHUP")
+			case syscall.SIGUSR2:
+				log.Println("SIGHUP")
 
-		for range sigchan {
-			for _, pid := range pids {
+				err := syscall.Kill(pid, syscall.SIGKILL)
+				if err != nil {
+					log.Println(err)
+
+					continue
+				}
+
+				time.Sleep(time.Second)
+
+				// if os.Getenv("_WORKER") != "true" {
+				// 	RunMaster()
+				// }
+			case syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT:
+				log.Println("quit")
+				// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				// defer cancel()
+				// return server.Shutdown(ctx)
+				log.Printf("kill process, pid=%v", pid)
+
+				err := syscall.Kill(pid, syscall.SIGKILL)
+				if err != nil {
+					continue
+				}
+
+				time.Sleep(time.Second)
+			default:
 				log.Printf("kill process, pid=%v", pid)
 
 				err := syscall.Kill(pid, syscall.SIGKILL)
@@ -83,7 +112,18 @@ func RunMaster() {
 				time.Sleep(time.Second)
 			}
 		}
+	}
+}
 
+func RunMaster() {
+	// Reap all children worker with no control or feedback.
+	go reap.ReapChildren(nil, nil, nil, nil)
+
+	var pids []int
+
+	// Ensure all subprocesses are killed.
+	go func() {
+		waitForSignals(pids)
 		os.Exit(0)
 	}()
 

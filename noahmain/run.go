@@ -19,6 +19,7 @@ func Run() {
 
 	for {
 		mod := noahlib.GetPluginPath() + "plugin_greeter.so"
+
 		plug, err := plugin.Open(mod)
 		if err != nil {
 			log.Println("open plugin failed", err)
@@ -38,6 +39,7 @@ func Run() {
 		// 3. Assert that loaded symbol is of a desired type
 		// in this case interface type Greeter (defined above)
 		var greeter Greeter
+
 		greeter, ok := symGreeter.(Greeter)
 		if !ok {
 			fmt.Println("unexpected type from module symbol")

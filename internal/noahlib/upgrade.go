@@ -3,14 +3,14 @@ package noahlib
 import (
 	"context"
 	"fmt"
-	"github.com/airdb/sailor"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
 
+	"github.com/airdb/sailor"
 	"github.com/minio/selfupdate"
+	"github.com/pkg/errors"
 )
 
 func DoSelfUpdate() {
@@ -65,10 +65,11 @@ func Downloader() {
 	defer resp.Body.Close()
 	content, _ := ioutil.ReadAll(resp.Body)
 
-	sailor.WriteFile(GetPluginPath() + mod, string(content))
+	err = sailor.WriteFile(GetPluginPath()+mod, string(content))
+	log.Println(err)
 }
 
-func doRequest(dl string) (*http.Response, error){
+func doRequest(dl string) (*http.Response, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
@@ -85,8 +86,8 @@ func doRequest(dl string) (*http.Response, error){
 		return nil, err
 	}
 
-	if resp.StatusCode  != http.StatusOK {
-		return  nil, errors.Errorf("http status code is", resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("http status code is %v", resp.StatusCode)
 	}
 
 	return resp, nil

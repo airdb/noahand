@@ -9,4 +9,5 @@ func (g greeting) Greet() {
 }
 
 // exported as symbol named "Greeter"
+// nolint
 var Greeter greeting
