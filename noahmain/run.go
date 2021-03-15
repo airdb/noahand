@@ -7,7 +7,7 @@ import (
 	"plugin"
 	"time"
 
-	"github.com/airdb/noah/internal/noahlib"
+	"airdb.io/airdb/noah/internal/noahlib"
 )
 
 type Greeter interface {

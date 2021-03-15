@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/airdb/noah/internal/noahlib"
+	"airdb.io/airdb/noah/internal/noahlib"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
