@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/airdb/sailor"
+	"airdb.io/airdb/sailor"
 	"github.com/minio/selfupdate"
 	"github.com/pkg/errors"
 )

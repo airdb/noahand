@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/airdb/noah/cmd"
+import "airdb.io/airdb/noah/cmd"
 
 func main() {
 	// noahmain.RunCaddyServer()

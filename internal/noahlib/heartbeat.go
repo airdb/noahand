@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/airdb/sailor"
+	"airdb.io/airdb/sailor"
 )
 
 type HostReq struct {

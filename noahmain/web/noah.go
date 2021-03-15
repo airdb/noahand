@@ -3,8 +3,8 @@ package web
 import (
 	"net/http"
 
-	"github.com/airdb/noah/internal/noahlib"
-	"github.com/airdb/sailor"
+	"airdb.io/airdb/noah/internal/noahlib"
+	"airdb.io/airdb/sailor"
 	"github.com/gin-gonic/gin"
 )
 
