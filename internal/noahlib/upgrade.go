@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"airdb.io/airdb/sailor"
+	"airdb.io/airdb/sailor/fileutil"
 	"github.com/minio/selfupdate"
 	"github.com/pkg/errors"
 )
@@ -65,7 +65,7 @@ func Downloader() {
 	defer resp.Body.Close()
 	content, _ := ioutil.ReadAll(resp.Body)
 
-	err = sailor.WriteFile(GetPluginPath()+mod, string(content))
+	err = fileutil.WriteFile(GetPluginPath()+mod, string(content))
 	log.Println(err)
 }
 

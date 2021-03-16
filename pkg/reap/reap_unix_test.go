@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/airdb/noah/pkg/reap"
+	"airdb.io/airdb/noah/pkg/reap"
 	"golang.org/x/sys/unix"
 )
 

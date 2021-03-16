@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	airdb.io/airdb/sailor v0.0.4
-	github.com/airdb/noah v0.0.2
+	github.com/caddyserver/caddy/v2 v2.3.0
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/minio/selfupdate v0.3.1

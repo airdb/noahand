@@ -3,11 +3,15 @@ package noahmain
 import (
 	"log"
 
-	"github.com/airdb/noah/noahmain/web"
+	"airdb.io/airdb/noah/noahmain/web"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/caddyserver/caddy/v2"
-	"github.com/caddyserver/caddy/caddyconfig"
+	caddycmd "github.com/caddyserver/caddy/v2/cmd"
+
+	// plug in Caddy modules here
+	_ "github.com/caddyserver/caddy/v2/modules/standard"
+
 )
 
 const DefaultAdminListen = "0.0.0.0:403"
@@ -16,6 +20,10 @@ func init() {
 	caddy.DefaultAdminConfig = &caddy.AdminConfig{
 		Listen: DefaultAdminListen,
 	}
+}
+
+func RunA() {
+	caddycmd.Main()
 }
 
 func RunServer() {

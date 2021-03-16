@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/airdb/noah/noahmain"
-	"github.com/airdb/noah/pkg/reap"
+	"airdb.io/airdb/noah/noahmain"
+	"airdb.io/airdb/noah/pkg/reap"
 	"github.com/spf13/cobra"
 )
 
