@@ -18,7 +18,5 @@ package main
 import "airdb.io/airdb/noah/cmd"
 
 func main() {
-	// noahmain.RunCaddyServer()
-	// return
 	cmd.Execute()
 }

@@ -21,7 +21,7 @@ test:
 
 build:
 	GOOS=$(myos) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY)
-	GOOS=$(myos) GOARCH=amd64 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
+	GOOS=$(myos) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
 
 PLATFORMS := windows linux darwin
 os = $(word 1, $@)

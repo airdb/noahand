@@ -1,9 +1,9 @@
-package noahmain
+package coremain
 
 import (
 	"log"
 
-	"airdb.io/airdb/noah/noahmain/web"
+	"airdb.io/airdb/noah/coremain/web"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/caddyserver/caddy/v2"
