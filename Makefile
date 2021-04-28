@@ -1,16 +1,12 @@
 BINARY := $(shell basename "$(PWD)")
-VERSION := $(shell git describe --tags)
+VERSION:=$(shell git describe --dirty --always)
 BUILD := $(shell git rev-parse HEAD)
 
+SYSTEM:=
 #LDFLAGS=-ldflags
 #LDFLAGS += "-X=github.com/airdb/adb/internal/adblib.Version=$(VERSION) \
 #            -X=github.com/airdb/adb/internal/adblib.Build=$(BUILD) \
 #            -X=github.com/airdb/adb/internal/adblib.BuildTime=$(shell date +%s)"
-
-myos = $(word 1, $@)
-ifndef $myos
-	myos = "$(shell uname | tr A-Z a-z)"
-endif
 
 .PHONY: test
 
@@ -20,8 +16,8 @@ test:
 	go test -v ./...
 
 build:
-	GOOS=$(myos) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY)
-	GOOS=$(myos) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
+	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY)
+	$(SYSTEM) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
 
 PLATFORMS := windows linux darwin
 os = $(word 1, $@)

@@ -8,11 +8,12 @@ import (
 	"os/signal"
 	"plugin"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
-	"airdb.io/airdb/noah/pkg/reap"
 	"airdb.io/airdb/noah/internal/noahlib"
+	"airdb.io/airdb/noah/pkg/reap"
 )
 
 type Greeter interface {
@@ -77,17 +78,19 @@ func Heartbeat() {
 	}
 }
 
-
 func Run() {
 	log.SetOutput(os.Stdout)
 	log.SetFlags(0) // Set to 0 because we're doing our own time, with timezone
 
-	if os.Getenv("_WORKER") == "true" {
-		RunPlugin()
-	} else {
-		go RunServer()
-		RunMaster()
-	}
+	Runa()
+	/*
+		if os.Getenv("_WORKER") == "true" {
+			RunPlugin()
+		} else {
+			go RunServer()
+			RunMaster()
+		}
+	*/
 }
 
 func waitForSignals(pids []int) {
@@ -247,4 +250,33 @@ func RunWorker(id int) (pid int, err error) {
 
 	// nolint: gosec
 	return syscall.ForkExec(os.Args[0], os.Args, execSpec)
+}
+
+func Runa() {
+	execSpec := &syscall.ProcAttr{
+		Env: os.Environ(),
+		Sys: &syscall.SysProcAttr{Setpgid: true},
+		Files: []uintptr{
+			os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd(),
+		},
+	}
+
+	for _, role := range []string{RoleMaster, RoleWorker} {
+		os.Args = append(os.Args, role)
+
+		cmd := strings.Join(os.Args, " ")
+		isRunning, err := noahlib.CheckProRunning(cmd)
+		fmt.Println(isRunning, err)
+		// if err != nil {
+		// 	return
+		// }
+
+		if isRunning {
+			log.Printf("%v is running\n", os.Args)
+			return
+		}
+
+		log.Println("run '%v'", os.Args)
+		syscall.ForkExec(os.Args[0], os.Args, execSpec)
+	}
 }
