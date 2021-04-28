@@ -34,7 +34,7 @@ func runInLinux(cmd string) (string, error) {
 
 //根据进程名判断进程是否运行
 func CheckProRunning(serverName string) (bool, error) {
-	a := `ps ux | awk '@` + serverName + `@ && !/awk/ {print $2}'`
+	a := `ps ux | awk '/` + serverName + `/' && !/awk/ '{print $2}'`
 	pid, err := RunCommand(a)
 	fmt.Println("xxx", err, pid)
 	if err != nil {

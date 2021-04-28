@@ -262,9 +262,10 @@ func Runa() {
 	}
 
 	for _, role := range []string{RoleMaster, RoleWorker} {
-		os.Args = append(os.Args, role)
+		args := append(os.Args, role)
 
-		cmd := strings.Join(os.Args, " ")
+		cmd := strings.Join(args, " ")
+
 		isRunning, err := noahlib.CheckProRunning(cmd)
 		fmt.Println(isRunning, err)
 		// if err != nil {
@@ -276,7 +277,7 @@ func Runa() {
 			return
 		}
 
-		log.Println("run '%v'", os.Args)
+		log.Printf("run '%v'\n", os.Args)
 		syscall.ForkExec(os.Args[0], os.Args, execSpec)
 	}
 }
