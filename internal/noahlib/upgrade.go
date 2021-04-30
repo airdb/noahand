@@ -26,6 +26,7 @@ func DoSelfUpdate() {
 
 	fmt.Printf("It will take about 1 minute for downloading.\nDownload url: %s\n", dl)
 
+	start := time.Now()
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
 	if err != nil {
 		log.Println(err)
@@ -41,20 +42,21 @@ func DoSelfUpdate() {
 		body = resp.Body
 	}
 
+	executable, err := os.Executable()
+	if err != nil {
+		log.Println("get_executable_fail")
+		return
+	}
+
+	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
+
+	log.Printf("%s download successfully, cost: %d\n", executable,  time.Since(start))
 	gr, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	executable, err := os.Executable()
-	if err != nil {
-		log.Println("get_executable_fail")
-		return
-	}
-	fmt.Println(executable, err)
-
-	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 	tr := tar.NewReader(gr)
 	for {
 		hdr, err := tr.Next()
@@ -64,12 +66,11 @@ func DoSelfUpdate() {
 			return
 		}
 
-		log.Printf("name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
-
 		data, err := ioutil.ReadAll(tr)
 		name := filepath.Base(executable) +"-"+ runtime.GOOS
 		// if hdr.Name == executable + runtime.GOOS {
-		if strings.HasSuffix(hdr.Name,name) {
+		if strings.HasSuffix(hdr.Name, name) {
+			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
 			err := ioutil.WriteFile(tmpPath, data, 0755) // #nosec
 			if err != nil {
 
@@ -88,6 +89,10 @@ func DoSelfUpdate() {
 	if err != nil {
 		log.Println(err)
 	}
+
+	log.Printf("%s install successfully, cost: %d\n", executable,  time.Since(start))
+	SendReloadSignal()
+	log.Printf("%s reload successfully, cost: %d\n", executable,  time.Since(start))
 }
 
 func Downloader() {
