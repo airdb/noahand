@@ -1,6 +1,7 @@
 package noahlib
 
 import (
+	"airdb.io/airdb/noah/internal/version"
 	"airdb.io/airdb/sailor"
 	"fmt"
 	"log"
@@ -20,6 +21,7 @@ type HostReq struct {
 	Arch string `url:"arch"`
 	IsStart string `url:"is_start,omitempty"`
 	Username string `url:"username"`
+	Version string `url:"version"`
 }
 
 type HostResp struct {
@@ -70,7 +72,6 @@ func RandomHeartbeat() {
 func Heartbeat() {
 	client := sailor.HTTPClient{}
 	client.SetURL(GetConfigURL())
-	// client.SetMethod(http.MethodGet)
 
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
@@ -82,11 +83,12 @@ func Heartbeat() {
 		Hostname: hostname,
 		Timestamp: fmt.Sprintf("%v", time.Now().Unix()),
 		Username: user.Username,
+		Version:  version.Version,
 	}
 
 	client.SetBody(&input)
 
-	client.SetUserAgent("noah-client/v0.0.1")
+	client.SetUserAgent(fmt.Sprintf("%s/%s", version.Repo, version.Version))
 
 	var output HostResp
 

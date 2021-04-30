@@ -3,10 +3,13 @@ VERSION:=$(shell git describe --dirty --always)
 BUILD := $(shell git rev-parse HEAD)
 
 SYSTEM:=
-#LDFLAGS=-ldflags
-#LDFLAGS += "-X=github.com/airdb/adb/internal/adblib.Version=$(VERSION) \
-#            -X=github.com/airdb/adb/internal/adblib.Build=$(BUILD) \
-#            -X=github.com/airdb/adb/internal/adblib.BuildTime=$(shell date +%s)"
+REPO := airdb.io/airdb/noah
+
+LDFLAGS=-ldflags
+LDFLAGS += "-X=$(REPO)/internal/version.Repo=$(REPO) \
+            -X=$(REPO)/internal/version.Version=$(VERSION) \
+            -X=$(REPO)/internal/version.Build=$(BUILD) \
+            -X=$(REPO)/internal/version.BuildTime=$(shell date +%s)"
 
 .PHONY: test
 

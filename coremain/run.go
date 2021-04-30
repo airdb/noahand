@@ -60,6 +60,6 @@ func Run() {
 	for {
 		noahlib.DoSelfUpdate()
 		log.Println("self update")
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 	}
 }
