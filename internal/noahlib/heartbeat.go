@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/user"
 	"runtime"
 	"time"
 )
@@ -16,7 +17,8 @@ type HostReq struct {
 	Hostname string `url:"hostname"`
 	Timestamp string `url:"timestamp"`
 	Arch string `url:"arch"`
-	IsStart string `url:"is_start"`
+	IsStart string `url:"is_start,omitempty"`
+	Username string `url:"username"`
 }
 
 type HostResp struct {
@@ -53,13 +55,15 @@ func Heartbeat() {
 	// client.SetMethod(http.MethodGet)
 
 	hostname, _ := os.Hostname()
+	user, _ := user.Current()
 
 	input := &HostReq{
 		OS: runtime.GOOS,
 		Arch: runtime.GOARCH,
 		IP: GetLocalIP(),
 		Hostname: hostname,
-		Timestamp: fmt.Sprintf("", time.Now().Unix()),
+		Timestamp: fmt.Sprintf("%v", time.Now().Unix()),
+		Username: user.Username,
 	}
 
 	client.SetBody(&input)
@@ -68,11 +72,9 @@ func Heartbeat() {
 
 	var output HostResp
 
-	err := sailor.HTTPRequest(&client, &output)
+	err := client.HTTPRequest(&client, &output)
 	if err != nil {
 		log.Println(err)
-
-		return
 	}
 
 	// log.Println("resp", output)

@@ -1,5 +1,6 @@
 main
 noah
+noah
 plugins/*.so
 docs
 .idea/

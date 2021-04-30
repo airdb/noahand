@@ -71,6 +71,7 @@ func Heartbeat() {
 		t := rand.Intn(maxSleepInterval)
 
 		log.Println("sleep time seed", t)
+		t =100
 
 		time.Sleep(time.Duration(t) * time.Second)
 
@@ -79,18 +80,9 @@ func Heartbeat() {
 }
 
 func Run() {
-	log.SetOutput(os.Stdout)
-	log.SetFlags(0) // Set to 0 because we're doing our own time, with timezone
-
-	Runa()
-	/*
-		if os.Getenv("_WORKER") == "true" {
-			RunPlugin()
-		} else {
-			go RunServer()
-			RunMaster()
-		}
-	*/
+	// log.SetOutput(os.Stdout)
+	// log.SetFlags(0) // Set to 0 because we're doing our own time, with timezone
+	Heartbeat()
 }
 
 func waitForSignals(pids []int) {

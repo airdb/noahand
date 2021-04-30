@@ -1,10 +1,10 @@
 package web
 
 import (
+	"airdb.io/airdb/sailor/osutil"
 	"net/http"
 
 	"airdb.io/airdb/noah/internal/noahlib"
-	"airdb.io/airdb/sailor"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +31,7 @@ func CmdExec(c *gin.Context) {
 		return
 	}
 
-	ret, err := sailor.ExecCommand(req.Cmd, req.Args)
+	ret, err := osutil.ExecCommand(req.Cmd, req.Args)
 	if err != nil {
 		c.String(http.StatusOK, "exec command failed")
 
