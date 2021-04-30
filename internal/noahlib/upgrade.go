@@ -17,10 +17,13 @@ import (
 )
 
 func DoSelfUpdate() {
+	/*
 	dl := "https://github.com/airdb/noah/releases/latest/download/noah"
 	if runtime.GOOS == "darwin" {
 		dl = dl + "-" + runtime.GOOS
 	}
+	 */
+	dl := "http://sg.airdb.host/release/noah-" + runtime.GOOS
 
 	fmt.Printf("It will take about 1 minute for downloading.\nDownload url: %s\n", dl)
 

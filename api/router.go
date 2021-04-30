@@ -19,6 +19,8 @@ func Run() {
 
 	r := gin.Default()
 
+
+	r.Static("/release", "./release")
 	r.GET("/", DefaultRoot)
 	r.GET("/host", DefaultRoot)
 
