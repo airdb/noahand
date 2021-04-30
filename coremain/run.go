@@ -71,7 +71,7 @@ func Heartbeat() {
 		t := rand.Intn(maxSleepInterval)
 
 		log.Println("sleep time seed", t)
-		t =100
+		t =10
 
 		time.Sleep(time.Duration(t) * time.Second)
 
