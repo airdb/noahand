@@ -59,7 +59,7 @@ func DoSelfUpdate() {
 
 	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 
-	log.Printf("%s download successfully, cost: %d\n", executable, time.Since(start))
+	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
 	gr, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
@@ -99,9 +99,9 @@ func DoSelfUpdate() {
 		log.Println(err)
 	}
 
-	log.Printf("%s install successfully, cost: %d\n", executable, time.Since(start))
+	log.Printf("%s install successfully, cost: %s\n", executable, time.Since(start))
 	SendReloadSignal()
-	log.Printf("%s reload successfully, cost: %d\n", executable, time.Since(start))
+	log.Printf("%s reload successfully, cost: %s\n", executable, time.Since(start))
 }
 
 func Downloader() {
