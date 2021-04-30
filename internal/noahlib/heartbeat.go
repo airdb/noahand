@@ -27,10 +27,12 @@ type HostReq struct {
 type HostResp struct {
 }
 
-func GetConfigURL() string {
-	configURL := "http://sg.airdb.host/host"
+const (
+	DefaultDomain = "http://sg.airdb.host"
+)
 
-	return configURL
+func GetConfigURL() string {
+	return DefaultDomain + "/host"
 }
 
 // GetLocalIP returns the non loopback local IP of the host.

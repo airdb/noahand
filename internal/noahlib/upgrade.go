@@ -1,33 +1,30 @@
 package noahlib
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
+	"time"
 
 	"airdb.io/airdb/sailor/fileutil"
-	"github.com/minio/selfupdate"
 	"github.com/pkg/errors"
 )
 
 func DoSelfUpdate() {
-	/*
-	dl := "https://github.com/airdb/noah/releases/latest/download/noah"
-	if runtime.GOOS == "darwin" {
-		dl = dl + "-" + runtime.GOOS
-	}
-	 */
-	dl := "http://sg.airdb.host/release/noah-" + runtime.GOOS
+	dl := DefaultDomain + "/release/noah_latest.zip"
 
 	fmt.Printf("It will take about 1 minute for downloading.\nDownload url: %s\n", dl)
-
-	client := &http.Client{}
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
 	if err != nil {
@@ -36,26 +33,60 @@ func DoSelfUpdate() {
 		return
 	}
 
-	resp, err := client.Do(req)
+	transport := http.DefaultTransport.(*http.Transport)
+	var body io.ReadCloser
+	resp, err := transport.RoundTrip(req)
+	if resp != nil {
+		defer resp.Body.Close()
+		body = resp.Body
+	}
+
+	gr, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
-
 		return
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		log.Println("download failed!")
-
-		return
-	}
-
-	defer resp.Body.Close()
-
-	err = selfupdate.Apply(resp.Body, selfupdate.Options{})
+	executable, err := os.Executable()
 	if err != nil {
-		log.Println("update failed!")
-	} else {
-		log.Println("update successfully!")
+		log.Println("get_executable_fail")
+		return
+	}
+	fmt.Println(executable, err)
+
+	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
+	tr := tar.NewReader(gr)
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			log.Println("download_zip_fail")
+
+			return
+		}
+
+		log.Printf("name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
+
+		data, err := ioutil.ReadAll(tr)
+		name := filepath.Base(executable) +"-"+ runtime.GOOS
+		// if hdr.Name == executable + runtime.GOOS {
+		if strings.HasSuffix(hdr.Name,name) {
+			err := ioutil.WriteFile(tmpPath, data, 0755) // #nosec
+			if err != nil {
+
+				return
+			}
+			// file written, quit listing loop.
+			break
+		}
+		if err != nil {
+			return
+		}
+	}
+
+	defer os.Remove(tmpPath)
+	err = exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
+	if err != nil {
+		log.Println(err)
 	}
 }
 
