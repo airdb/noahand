@@ -14,14 +14,14 @@ import (
 )
 
 type HostReq struct {
-	IP string `url:"ip"`
-	OS string `url:"os"`
-	Hostname string `url:"hostname"`
+	IP        string `url:"ip"`
+	OS        string `url:"os"`
+	Hostname  string `url:"hostname"`
 	Timestamp string `url:"timestamp"`
-	Arch string `url:"arch"`
-	IsStart string `url:"is_start,omitempty"`
-	Username string `url:"username"`
-	Version string `url:"version"`
+	Arch      string `url:"arch"`
+	IsStart   string `url:"is_start,omitempty"`
+	Username  string `url:"username"`
+	Version   string `url:"version"`
 }
 
 type HostResp struct {
@@ -63,7 +63,7 @@ func RandomHeartbeat() {
 		t := rand.Intn(maxSleepInterval)
 
 		log.Println("sleep time seed", t)
-		t =10
+		t = 10
 
 		time.Sleep(time.Duration(t) * time.Second)
 
@@ -79,13 +79,13 @@ func Heartbeat() {
 	user, _ := user.Current()
 
 	input := &HostReq{
-		OS: runtime.GOOS,
-		Arch: runtime.GOARCH,
-		IP: GetLocalIP(),
-		Hostname: hostname,
+		OS:        runtime.GOOS,
+		Arch:      runtime.GOARCH,
+		IP:        GetLocalIP(),
+		Hostname:  hostname,
 		Timestamp: fmt.Sprintf("%v", time.Now().Unix()),
-		Username: user.Username,
-		Version:  version.Version,
+		Username:  user.Username,
+		Version:   version.Version,
 	}
 
 	client.SetBody(&input)

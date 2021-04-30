@@ -20,7 +20,7 @@ test:
 
 build:
 	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o main main.go
-	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY) cmd/cli/main.go
+	#$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY) cmd/cli/main.go
 	#$(SYSTEM) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
 
 PLATFORMS := windows linux darwin

@@ -37,10 +37,19 @@ func DoSelfUpdate() {
 	transport := http.DefaultTransport.(*http.Transport)
 	var body io.ReadCloser
 	resp, err := transport.RoundTrip(req)
-	if resp != nil {
-		defer resp.Body.Close()
-		body = resp.Body
+	if err != nil {
+		log.Println("download zip file fail, url:", dl)
+
+		return
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Println("download server unreachable")
+
+		return
+	}
+
+	body = resp.Body
 
 	executable, err := os.Executable()
 	if err != nil {
@@ -50,7 +59,7 @@ func DoSelfUpdate() {
 
 	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 
-	log.Printf("%s download successfully, cost: %d\n", executable,  time.Since(start))
+	log.Printf("%s download successfully, cost: %d\n", executable, time.Since(start))
 	gr, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
@@ -67,7 +76,7 @@ func DoSelfUpdate() {
 		}
 
 		data, err := ioutil.ReadAll(tr)
-		name := filepath.Base(executable) +"-"+ runtime.GOOS
+		name := filepath.Base(executable) + "-" + runtime.GOOS
 		// if hdr.Name == executable + runtime.GOOS {
 		if strings.HasSuffix(hdr.Name, name) {
 			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
@@ -90,9 +99,9 @@ func DoSelfUpdate() {
 		log.Println(err)
 	}
 
-	log.Printf("%s install successfully, cost: %d\n", executable,  time.Since(start))
+	log.Printf("%s install successfully, cost: %d\n", executable, time.Since(start))
 	SendReloadSignal()
-	log.Printf("%s reload successfully, cost: %d\n", executable,  time.Since(start))
+	log.Printf("%s reload successfully, cost: %d\n", executable, time.Since(start))
 }
 
 func Downloader() {

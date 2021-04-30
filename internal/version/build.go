@@ -47,7 +47,7 @@ func (info *BuildInfo) ToString() string {
 	return string(out)
 }
 
-func ToString() string{
+func ToString() string {
 	info := GetBuildInfo()
 	out, err := json.Marshal(info)
 	if err != nil {
