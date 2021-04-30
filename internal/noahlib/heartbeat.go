@@ -62,8 +62,8 @@ func RandomHeartbeat() {
 		// nolint: gosec
 		t := rand.Intn(maxSleepInterval)
 
-		log.Println("sleep time seed", t)
 		t = 10
+		log.Println("sleep time seed", t)
 
 		time.Sleep(time.Duration(t) * time.Second)
 
@@ -98,7 +98,4 @@ func Heartbeat() {
 	if err != nil {
 		log.Println(err)
 	}
-
-	// log.Println("resp", output)
-	log.Println("resp")
 }
