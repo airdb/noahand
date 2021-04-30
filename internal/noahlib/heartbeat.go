@@ -67,6 +67,10 @@ func RandomHeartbeat() {
 
 		time.Sleep(time.Duration(t) * time.Second)
 
+		if version.GetDeployVersion() != version.GetRunningVersion() {
+			SendReloadSignal()
+		}
+
 		Heartbeat()
 	}
 }
