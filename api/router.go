@@ -19,11 +19,8 @@ func Run() {
 
 	r := gin.Default()
 
-	projectPath := "/host"
-	r.GET(projectPath, DefaultRoot)
-
-	API := r.Group(projectPath)
-	API.GET("/", DefaultRoot)
+	r.GET("/", DefaultRoot)
+	r.GET("/host", DefaultRoot)
 
 	defaultPort := ":80"
 	r.Run(defaultPort)

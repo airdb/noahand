@@ -82,6 +82,8 @@ func Heartbeat() {
 func Run() {
 	// log.SetOutput(os.Stdout)
 	// log.SetFlags(0) // Set to 0 because we're doing our own time, with timezone
+	noahlib.StartSupervisor()
+
 	Heartbeat()
 }
 
