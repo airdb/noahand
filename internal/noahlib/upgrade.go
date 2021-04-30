@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
 	"runtime"
+	"strconv"
 
 	"airdb.io/airdb/sailor/fileutil"
 	"github.com/minio/selfupdate"
@@ -91,4 +94,21 @@ func doRequest(dl string) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func InstallProcess() {
+	tmpPath := "/sbin/noah"
+	executable := "/tmp/noah_latest"
+	defer os.Remove(tmpPath)
+	err := exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func SendReloadSignal() error {
+	ppid := strconv.Itoa(os.Getppid())
+	err := exec.CommandContext(context.Background(), "/bin/kill", "-HUP", ppid).Run()
+
+	return err
 }

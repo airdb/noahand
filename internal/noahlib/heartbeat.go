@@ -4,6 +4,7 @@ import (
 	"airdb.io/airdb/sailor"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"os/user"
@@ -47,6 +48,23 @@ func GetLocalIP() string {
 	}
 
 	return ""
+}
+
+func RandomHeartbeat() {
+	for {
+		// rand.Seed(900)
+		maxSleepInterval := 60
+
+		// nolint: gosec
+		t := rand.Intn(maxSleepInterval)
+
+		log.Println("sleep time seed", t)
+		t =10
+
+		time.Sleep(time.Duration(t) * time.Second)
+
+		Heartbeat()
+	}
 }
 
 func Heartbeat() {
