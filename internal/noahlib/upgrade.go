@@ -100,7 +100,7 @@ func DoSelfUpdate() {
 	}
 
 	log.Printf("%s install successfully, cost: %s\n", executable, time.Since(start))
-	SendReloadSignal()
+	// SendReloadSignal()
 	log.Printf("%s reload successfully, cost: %s\n", executable, time.Since(start))
 }
 
