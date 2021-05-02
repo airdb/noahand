@@ -32,5 +32,5 @@ $(PLATFORMS):
 	CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build $(LDFLAGS) -o release/$(BINARY)-$(os) cmd/cli/main.go
 
 .PHONY: release
-release: windows linux darwin
+release: linux darwin
 	tar czvf release/$(BINARY)_latest.zip release/$(BINARY)-*
