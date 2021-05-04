@@ -5,3 +5,4 @@ plugins/*.so
 docs
 .idea/
 conf
+release/

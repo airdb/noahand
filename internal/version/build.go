@@ -1,9 +1,12 @@
 package version
 
 import (
+	"context"
 	"encoding/json"
 	"os"
+	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -45,4 +48,41 @@ func (info *BuildInfo) ToString() string {
 	}
 
 	return string(out)
+}
+
+func ToString() string {
+	info := GetBuildInfo()
+	out, err := json.Marshal(info)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(out)
+}
+
+const nullVersion  = "0.0.0"
+func getDeployVersion(executable string) string {
+	var sb strings.Builder
+	cmd := exec.CommandContext(context.Background(), executable, "-version")
+	cmd.Stdout = &sb
+	cmd.Stderr = &sb
+	err := cmd.Run()
+	if err != nil {
+		return nullVersion
+	}
+
+	return sb.String()
+}
+
+func GetDeployVersion() string {
+	executable, err := os.Executable()
+	if err != nil {
+		return nullVersion
+	}
+
+	return getDeployVersion(executable)
+}
+
+func GetRunningVersion() string {
+	return Version
 }

@@ -1,28 +1,32 @@
 package noahlib
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strconv"
+	"strings"
+	"time"
 
 	"airdb.io/airdb/sailor/fileutil"
-	"github.com/minio/selfupdate"
 	"github.com/pkg/errors"
 )
 
 func DoSelfUpdate() {
-	dl := "https://github.com/airdb/noah/releases/latest/download/noah"
-	if runtime.GOOS == "darwin" {
-		dl = dl + "-" + runtime.GOOS
-	}
+	dl := DefaultDomain + "/release/noah_latest.zip"
 
-	fmt.Printf("It will take about 1 minute for downloading.\nDownload url: %s\n", dl)
+	log.Printf("download url: %s\n", dl)
 
-	client := &http.Client{}
-
+	start := time.Now()
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
 	if err != nil {
 		log.Println(err)
@@ -30,27 +34,74 @@ func DoSelfUpdate() {
 		return
 	}
 
-	resp, err := client.Do(req)
+	transport := http.DefaultTransport.(*http.Transport)
+	var body io.ReadCloser
+	resp, err := transport.RoundTrip(req)
 	if err != nil {
-		log.Println(err)
+		log.Println("download zip file fail, url:", dl)
 
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		log.Println("download failed!")
+		log.Println("download server unreachable")
 
 		return
 	}
 
-	defer resp.Body.Close()
+	body = resp.Body
 
-	err = selfupdate.Apply(resp.Body, selfupdate.Options{})
+	executable, err := os.Executable()
 	if err != nil {
-		log.Println("update failed!")
-	} else {
-		log.Println("update successfully!")
+		log.Println("get_executable_fail")
+		return
 	}
+
+	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
+
+	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
+	gr, err := gzip.NewReader(body)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	tr := tar.NewReader(gr)
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			log.Println("download_zip_fail")
+
+			return
+		}
+
+		data, err := ioutil.ReadAll(tr)
+		name := filepath.Base(executable) + "-" + runtime.GOOS
+		// if hdr.Name == executable + runtime.GOOS {
+		if strings.HasSuffix(hdr.Name, name) {
+			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
+			err := ioutil.WriteFile(tmpPath, data, 0755) // #nosec
+			if err != nil {
+
+				return
+			}
+			// file written, quit listing loop.
+			break
+		}
+		if err != nil {
+			return
+		}
+	}
+
+	defer os.Remove(tmpPath)
+	err = exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("%s install successfully, cost: %s\n", executable, time.Since(start))
+	// SendReloadSignal()
+	log.Printf("%s reload successfully, cost: %s\n", executable, time.Since(start))
 }
 
 func Downloader() {
@@ -91,4 +142,21 @@ func doRequest(dl string) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func InstallProcess() {
+	tmpPath := "/sbin/noah"
+	executable := "/tmp/noah_latest"
+	defer os.Remove(tmpPath)
+	err := exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func SendReloadSignal() error {
+	ppid := strconv.Itoa(os.Getppid())
+	err := exec.CommandContext(context.Background(), "/bin/kill", "-HUP", ppid).Run()
+
+	return err
 }

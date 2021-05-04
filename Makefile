@@ -3,10 +3,13 @@ VERSION:=$(shell git describe --dirty --always)
 BUILD := $(shell git rev-parse HEAD)
 
 SYSTEM:=
-#LDFLAGS=-ldflags
-#LDFLAGS += "-X=github.com/airdb/adb/internal/adblib.Version=$(VERSION) \
-#            -X=github.com/airdb/adb/internal/adblib.Build=$(BUILD) \
-#            -X=github.com/airdb/adb/internal/adblib.BuildTime=$(shell date +%s)"
+REPO := airdb.io/airdb/noah
+
+LDFLAGS=-ldflags
+LDFLAGS += "-X=$(REPO)/internal/version.Repo=$(REPO) \
+            -X=$(REPO)/internal/version.Version=$(VERSION) \
+            -X=$(REPO)/internal/version.Build=$(BUILD) \
+            -X=$(REPO)/internal/version.BuildTime=$(shell date +%s)"
 
 .PHONY: test
 
@@ -26,7 +29,8 @@ os = $(word 1, $@)
 .PHONY: $(PLATFORMS)
 $(PLATFORMS):
 	mkdir -p release
-	CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build $(LDFLAGS) -o release/$(BINARY)-$(os)
+	CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build $(LDFLAGS) -o release/$(BINARY)-$(os) cmd/cli/main.go
 
 .PHONY: release
-release: windows linux darwin
+release: linux darwin
+	tar czvf release/$(BINARY)_latest.zip release/$(BINARY)-*

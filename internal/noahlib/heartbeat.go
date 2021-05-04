@@ -1,9 +1,11 @@
 package noahlib
 
 import (
+	"airdb.io/airdb/noah/internal/version"
 	"airdb.io/airdb/sailor"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"os/user"
@@ -12,22 +14,25 @@ import (
 )
 
 type HostReq struct {
-	IP string `url:"ip"`
-	OS string `url:"os"`
-	Hostname string `url:"hostname"`
+	IP        string `url:"ip"`
+	OS        string `url:"os"`
+	Hostname  string `url:"hostname"`
 	Timestamp string `url:"timestamp"`
-	Arch string `url:"arch"`
-	IsStart string `url:"is_start,omitempty"`
-	Username string `url:"username"`
+	Arch      string `url:"arch"`
+	IsStart   string `url:"is_start,omitempty"`
+	Username  string `url:"username"`
+	Version   string `url:"version"`
 }
 
 type HostResp struct {
 }
 
-func GetConfigURL() string {
-	configURL := "http://sg.airdb.host/host"
+const (
+	DefaultDomain = "http://sg.airdb.host"
+)
 
-	return configURL
+func GetConfigURL() string {
+	return DefaultDomain + "/host"
 }
 
 // GetLocalIP returns the non loopback local IP of the host.
@@ -49,26 +54,49 @@ func GetLocalIP() string {
 	return ""
 }
 
+func RandomHeartbeat() {
+	for {
+		// rand.Seed(900)
+		maxSleepInterval := 60
+
+		// nolint: gosec
+		t := rand.Intn(maxSleepInterval)
+
+		t = 10
+		log.Println("sleep time seed", t)
+
+		time.Sleep(time.Duration(t) * time.Second)
+
+		/*
+			if version.GetDeployVersion() != version.GetRunningVersion() {
+				SendReloadSignal()
+			}
+		*/
+
+		Heartbeat()
+	}
+}
+
 func Heartbeat() {
 	client := sailor.HTTPClient{}
 	client.SetURL(GetConfigURL())
-	// client.SetMethod(http.MethodGet)
 
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
 
 	input := &HostReq{
-		OS: runtime.GOOS,
-		Arch: runtime.GOARCH,
-		IP: GetLocalIP(),
-		Hostname: hostname,
+		OS:        runtime.GOOS,
+		Arch:      runtime.GOARCH,
+		IP:        GetLocalIP(),
+		Hostname:  hostname,
 		Timestamp: fmt.Sprintf("%v", time.Now().Unix()),
-		Username: user.Username,
+		Username:  user.Username,
+		Version:   version.Version,
 	}
 
 	client.SetBody(&input)
 
-	client.SetUserAgent("noah-client/v0.0.1")
+	client.SetUserAgent(fmt.Sprintf("%s/%s", version.Repo, version.Version))
 
 	var output HostResp
 
@@ -76,7 +104,4 @@ func Heartbeat() {
 	if err != nil {
 		log.Println(err)
 	}
-
-	// log.Println("resp", output)
-	log.Println("resp")
 }
