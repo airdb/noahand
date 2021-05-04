@@ -53,15 +53,15 @@ func RunPlugin() {
 }
 
 func Run() {
-	// Master process
+	// Supervisor process.
 	noahlib.StartSupervisor()
+	noahlib.WaitWorkerSignals()
 
-	// Worker process
+	// Worker process.
 	for {
 		noahlib.DoSelfUpdate()
 		log.Println("self update")
 		time.Sleep(time.Minute)
 	}
 
-	noahlib.WaitWorkerSignals()
 }
