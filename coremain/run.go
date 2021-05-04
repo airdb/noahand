@@ -55,13 +55,19 @@ func RunPlugin() {
 func Run() {
 	// Supervisor process.
 	noahlib.StartSupervisor()
-	noahlib.WaitWorkerSignals()
+
+	// Heart beat, and get running config.
+	go noahlib.RandomHeartbeat()
 
 	// Worker process.
 	for {
-		noahlib.DoSelfUpdate()
+		log.Println("start_worker")
+		// noahlib.RandomHeartbeat()
+		noahlib.DownloadZip()
+		// noahlib.DoSelfUpdate()
 		log.Println("self update")
 		time.Sleep(time.Minute)
 	}
 
+	noahlib.WaitWorkerSignals()
 }

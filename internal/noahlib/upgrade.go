@@ -160,3 +160,68 @@ func SendReloadSignal() error {
 
 	return err
 }
+
+func DownloadZip() {
+	name := "noah_latest.zip"
+	dl := DefaultDomain + "/release/" + name
+
+	log.Printf("download url: %s\n", dl)
+
+	start := time.Now()
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
+	if err != nil {
+		log.Println(err)
+
+		return
+	}
+
+	transport := http.DefaultTransport.(*http.Transport)
+	var body io.ReadCloser
+	resp, err := transport.RoundTrip(req)
+	if err != nil {
+		log.Println("download zip file fail, url:", dl)
+
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Println("download server unreachable")
+
+		return
+	}
+
+	body = resp.Body
+
+	// tmpPath := fmt.Sprintf("/tmp/%s.%d", name, time.Now().UnixNano())
+
+	log.Printf("%s download successfully, cost: %s\n", name, time.Since(start))
+	ExtraTar(body)
+}
+
+func ExtraTar(body io.Reader) {
+	gr, err := gzip.NewReader(body)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	tr := tar.NewReader(gr)
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			log.Println("download zip fail")
+
+			return
+		}
+
+		// data, err := ioutil.ReadAll(tr)
+		log.Println(hdr.Name)
+		// log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
+
+		// err := ioutil.WriteFile(tmpPath, data, 0755) // #nosec
+		// if err != nil {
+
+		// 	return
+		// }
+	}
+}

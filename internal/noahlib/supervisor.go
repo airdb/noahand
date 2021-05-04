@@ -68,7 +68,7 @@ func StartSupervisor() {
 	}
 
 	go supervisor()
-	go RandomHeartbeat()
+	// go RandomHeartbeat()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM)

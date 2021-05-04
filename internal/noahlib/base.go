@@ -12,3 +12,10 @@ func GetPluginPath() string {
 
 	return ""
 }
+
+const (
+	NoahPath       = "/srv/noah"
+	NoahBinPath    = "/srv/noah/bin"
+	NoahModulePath = "/srv/noah/module/"
+	NoahPluginPath = "/srv/noah/plugin/"
+)
