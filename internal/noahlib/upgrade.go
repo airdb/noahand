@@ -24,7 +24,7 @@ import (
 func DoSelfUpdate() {
 	dl := DefaultDomain + "/release/noah_latest.zip"
 
-	fmt.Printf("It will take about 1 minute for downloading.\nDownload url: %s\n", dl)
+	log.Printf("download url: %s\n", dl)
 
 	start := time.Now()
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)

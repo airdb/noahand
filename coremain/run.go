@@ -62,4 +62,6 @@ func Run() {
 		log.Println("self update")
 		time.Sleep(time.Minute)
 	}
+
+	noahlib.WaitWorkerSignals()
 }
