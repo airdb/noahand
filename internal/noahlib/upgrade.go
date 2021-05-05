@@ -2,10 +2,9 @@ package noahlib
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -198,86 +197,42 @@ func DownloadZip() {
 
 	log.Printf("%s download successfully, cost: %s\n", tmpPath, time.Since(start))
 
-	outFile, err := os.Create(tmpPath)
-	defer outFile.Close()
+	// use tee first, then use `ioutil.NopCloser(buf)`
+	buf := &bytes.Buffer{}
+	tee := io.TeeReader(resp.Body, buf)
 
-	_, err = io.Copy(outFile, resp.Body)
+	md5sum := fileutil.GetMd5Sum(tee)
+	tmpWorkDir := path.Join(GetNoahModulePath(), md5sum)
+	fileutil.EnsureFolderExists(tmpWorkDir)
+
+	defer os.Chdir(GetWorkingPath())
+	os.Chdir(tmpWorkDir)
+
+	fileutil.ExtraTarFile(ioutil.NopCloser(buf))
+}
+
+func DownloaderV2(dlurl string) io.Reader{
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dlurl, nil)
 	if err != nil {
 		log.Println(err)
+
+		return nil
 	}
 
-	defer os.Remove(tmpPath)
-	md5sum := GetFileMD5(tmpPath)
+	transport := http.DefaultTransport.(*http.Transport)
 
-	ExtraTar(tmpPath, md5sum)
-}
-
-func GetFileMD5(filename string) string {
-	f, err := os.Open(filename)
+	resp, err := transport.RoundTrip(req)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
+		log.Println("download zip file fail, url:", dlurl)
 
-	h := md5.New()
-	if _, err := io.Copy(h, f); err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("%x", h.Sum(nil))
-
-	return hex.EncodeToString(h.Sum(nil))
-}
-func ExtraTar(filename, md5sum string) {
-	f, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	fileutil.EnsureFolderExists(path.Join(GetNoahModulePath(), md5sum))
-
-
-	uncompressedStream, err := gzip.NewReader(f)
-	if err != nil {
-		log.Fatal("ExtractTarGz: NewReader failed")
+		return nil
 	}
 
-	tarReader := tar.NewReader(uncompressedStream)
+	if resp.StatusCode != http.StatusOK {
+		log.Println("download server unreachable")
 
-	for true {
-		header, err := tarReader.Next()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Fatalf("ExtractTarGz: Next() failed: %s", err.Error())
-		}
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			filename := path.Join(GetNoahModulePath(), md5sum, header.Name)
-			fileutil.EnsureFolderExists(filename)
-			if err := os.Mkdir(filename, 0755); err != nil {
-				log.Fatalf("ExtractTarGz: Mkdir() failed: %s", err.Error())
-			}
-		case tar.TypeReg:
-			filename := path.Join(GetNoahModulePath(), md5sum, header.Name)
-			outFile, err := os.Create(filename)
-			if err != nil {
-				log.Fatalf("ExtractTarGz: Create() failed: %s", err.Error())
-			}
-			if _, err := io.Copy(outFile, tarReader); err != nil {
-				log.Fatalf("ExtractTarGz: Copy() failed: %s", err.Error())
-			}
-			outFile.Close()
-
-		default:
-			log.Fatalf(
-				"ExtractTarGz: uknown type: %s in %s",
-				header.Typeflag,
-				header.Name)
-		}
+		return nil
 	}
+
+	return resp.Body
 }
