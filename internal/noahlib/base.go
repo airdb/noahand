@@ -1,21 +1,34 @@
 package noahlib
 
-import "runtime"
-
-func GetPluginPath() string {
-	switch runtime.GOOS {
-	case "linux":
-		return "/srv/noah/plugins/"
-	case "darwin":
-		return "./plugins/"
-	}
-
-	return ""
-}
+import (
+	"path"
+	"runtime"
+)
 
 const (
-	NoahPath       = "/srv/noah"
-	NoahBinPath    = "/srv/noah/bin"
-	NoahModulePath = "/srv/noah/module/"
-	NoahPluginPath = "/srv/noah/plugin/"
+	LinuxWorkDir  = "/srv/noah"
+	DarwinWorkDir = "./noah-agent"
 )
+
+func GetWorkingPath() string {
+	switch runtime.GOOS {
+	case "linux":
+		return LinuxWorkDir
+	case "darwin":
+		return DarwinWorkDir
+	default:
+		return DarwinWorkDir
+	}
+}
+
+func GetNoahBinPath() string {
+	return path.Join(GetWorkingPath(), "module")
+}
+
+func GetNoahModulePath() string {
+	return path.Join(GetWorkingPath(), "module")
+}
+
+func GetNoahPluginPath() string {
+	return path.Join(GetWorkingPath(), "plugin")
+}

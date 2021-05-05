@@ -15,7 +15,7 @@ type Greeter interface {
 
 func RunPlugin() {
 	for {
-		mod := noahlib.GetPluginPath() + "plugin_greeter.so"
+		mod := noahlib.GetNoahPluginPath() + "plugin_greeter.so"
 
 		plug, err := plugin.Open(mod)
 		if err != nil {
