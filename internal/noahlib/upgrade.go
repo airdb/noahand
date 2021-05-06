@@ -1,6 +1,7 @@
 package noahlib
 
 import (
+	"airdb.io/airdb/sailor"
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
@@ -9,7 +10,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -20,38 +20,24 @@ import (
 	"time"
 
 	"airdb.io/airdb/sailor/fileutil"
-	"github.com/pkg/errors"
 )
 
 func DoSelfUpdate() {
-	dl := DefaultDomain + "/release/noah_latest.zip"
+	name := "noah_latest.zip"
+	dl := DefaultDomain + "/release/" +  name
 
 	log.Printf("download url: %s\n", dl)
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
+	client := sailor.NewHTTPClient()
+	client.SetURL(dl)
+
+	httpReader, err := client.Downloader()
 	if err != nil {
-		log.Println(err)
-
 		return
 	}
 
-	transport := http.DefaultTransport.(*http.Transport)
-	var body io.ReadCloser
-	resp, err := transport.RoundTrip(req)
-	if err != nil {
-		log.Println("download zip file fail, url:", dl)
-
-		return
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		log.Println("download server unreachable")
-
-		return
-	}
-
-	body = resp.Body
+	log.Printf("%s download successfully, cost: %s\n", name, time.Since(start))
 
 	executable, err := os.Executable()
 	if err != nil {
@@ -62,7 +48,9 @@ func DoSelfUpdate() {
 	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 
 	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
-	gr, err := gzip.NewReader(body)
+
+	defer httpReader.Close()
+	gr, err := gzip.NewReader(httpReader)
 	if err != nil {
 		log.Println(err)
 
@@ -108,43 +96,25 @@ func DoSelfUpdate() {
 }
 
 func Downloader() {
-	mod := "plugin_greeter.so"
-	dl := "https://github.com/airdb/noah/releases/latest/download/" + mod
+	name := "plugin_greeter.so"
+	dl := "https://github.com/airdb/noah/releases/latest/download/"  + name
 
-	resp, err := doRequest(dl)
+	start := time.Now()
+	client := sailor.NewHTTPClient()
+	client.SetURL(dl)
+
+	httpReader, err := client.Downloader()
 	if err != nil {
 		return
 	}
 
-	defer resp.Body.Close()
-	content, _ := ioutil.ReadAll(resp.Body)
+	log.Printf("%s download successfully, cost: %s\n", name, time.Since(start))
 
-	err = fileutil.WriteFile(GetNoahPluginPath()+mod, string(content))
+	defer httpReader.Close()
+	content, _ := ioutil.ReadAll(httpReader)
+
+	err = fileutil.WriteFile(GetNoahPluginPath()+ name, string(content))
 	log.Println(err)
-}
-
-func doRequest(dl string) (*http.Response, error) {
-	client := &http.Client{}
-
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
-	if err != nil {
-		log.Println(err)
-
-		return nil, err
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-
-		return nil, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("http status code is %v", resp.StatusCode)
-	}
-
-	return resp, nil
 }
 
 func InstallProcess() {
@@ -168,38 +138,24 @@ func DownloadZip() {
 	name := "modules.zip"
 	dl := DefaultDomain + "/release/" + name
 
-	log.Printf("download url: %s\n", dl)
+	client := sailor.NewHTTPClient()
+	client.SetURL(dl)
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
+	httpReader, err := client.Downloader()
 	if err != nil {
 		log.Println(err)
 
 		return
 	}
 
-	transport := http.DefaultTransport.(*http.Transport)
+	log.Printf("%s download successfully, cost: %s\n", name, time.Since(start))
 
-	resp, err := transport.RoundTrip(req)
-	if err != nil {
-		log.Println("download zip file fail, url:", dl)
 
-		return
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		log.Println("download server unreachable")
-
-		return
-	}
-
-	tmpPath := fmt.Sprintf("/tmp/%s.%d", name, time.Now().UnixNano())
-
-	log.Printf("%s download successfully, cost: %s\n", tmpPath, time.Since(start))
-
+	defer httpReader.Close()
 	// use tee first, then use `ioutil.NopCloser(buf)`
 	buf := &bytes.Buffer{}
-	tee := io.TeeReader(resp.Body, buf)
+	tee := io.TeeReader(httpReader, buf)
 
 	md5sum := fileutil.GetMd5Sum(tee)
 	tmpWorkDir := path.Join(GetNoahModulePath(), md5sum)
@@ -209,30 +165,4 @@ func DownloadZip() {
 	os.Chdir(tmpWorkDir)
 
 	fileutil.ExtraTarFile(ioutil.NopCloser(buf))
-}
-
-func DownloaderV2(dlurl string) io.Reader{
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dlurl, nil)
-	if err != nil {
-		log.Println(err)
-
-		return nil
-	}
-
-	transport := http.DefaultTransport.(*http.Transport)
-
-	resp, err := transport.RoundTrip(req)
-	if err != nil {
-		log.Println("download zip file fail, url:", dlurl)
-
-		return nil
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		log.Println("download server unreachable")
-
-		return nil
-	}
-
-	return resp.Body
 }

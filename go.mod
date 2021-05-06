@@ -3,7 +3,7 @@ module airdb.io/airdb/noah
 go 1.16
 
 require (
-	airdb.io/airdb/sailor v0.0.11-0.20210505161630-9c37428c1eaf
+	airdb.io/airdb/sailor v0.0.11-0.20210506160742-bad10ffe776e
 	github.com/caddyserver/caddy/v2 v2.3.0
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.6.3
