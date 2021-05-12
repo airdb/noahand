@@ -1,13 +1,7 @@
-airdb.io/airdb/sailor v0.0.11-0.20210505161630-9c37428c1eaf h1:nP9CtdhOaCeSZhBLbx7Q4j/t7gLY8ronNuJ5GS9uZD0=
-airdb.io/airdb/sailor v0.0.11-0.20210505161630-9c37428c1eaf/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
-airdb.io/airdb/sailor v0.0.11-0.20210506155055-c868615abccf h1:HskScmrMRMOnfz/9Wt71DXli2j4+/8Yba7pF+huRcB0=
-airdb.io/airdb/sailor v0.0.11-0.20210506155055-c868615abccf/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
-airdb.io/airdb/sailor v0.0.11-0.20210506155859-f036540e1fa9 h1:/PQz557odwJk7uHdpdoamvApvsk5x86Zv2ligsvoM7c=
-airdb.io/airdb/sailor v0.0.11-0.20210506155859-f036540e1fa9/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
 airdb.io/airdb/sailor v0.0.11-0.20210506160742-bad10ffe776e h1:kp2Sbje9mpYFWZJCgPVq/drXooRs/H5ldlXry7t0ObQ=
 airdb.io/airdb/sailor v0.0.11-0.20210506160742-bad10ffe776e/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
-airdb.io/airdb/sailor v0.0.11 h1:2gI3YaFShvQOKkQdBBKOsILhs3FsuQtJa+2CGLqCmTs=
-airdb.io/airdb/sailor v0.0.11/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
+airdb.io/airdb/sailor v0.0.11-0.20210507200443-f3e444916646 h1:Nm8KXe36Gum0/zDas9o8+VXgq7fDUvt/fVH7d3lv5vk=
+airdb.io/airdb/sailor v0.0.11-0.20210507200443-f3e444916646/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.31.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
