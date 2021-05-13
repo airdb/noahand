@@ -6,16 +6,16 @@ import (
 )
 
 const (
-	LinuxWorkDir  = "/srv/noah"
-	DarwinWorkDir = "./noah-agent"
+	DefaultWorkDir = "/opt/noah"
+	DarwinWorkDir  = "./noah-agent"
 )
 
 func GetWorkingPath() string {
 	switch runtime.GOOS {
 	case "linux":
-		return LinuxWorkDir
+		return DefaultWorkDir
 	case "darwin":
-		return DarwinWorkDir
+		return DefaultWorkDir
 	default:
 		return DarwinWorkDir
 	}

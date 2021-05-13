@@ -41,7 +41,8 @@ func DoSelfUpdate() {
 
 	executable, err := os.Executable()
 	if err != nil {
-		log.Println("get_executable_fail")
+		log.Println("get executable fail")
+
 		return
 	}
 

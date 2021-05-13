@@ -39,8 +39,7 @@ func RunServer() {
 
 	addr := "0.0.0.0:403"
 
-	err := router.Run(addr)
-	if err != nil {
+	if err := router.Run(addr); err != nil {
 		log.Fatal("start server failed, addr:", addr)
 	}
 }

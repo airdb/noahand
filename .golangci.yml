@@ -1,16 +1,23 @@
 run:
 
 linters-settings:
-  maligned:
-    suggest-new: true
   gocritic:
     disabled-checks:
       - singleCaseSwitch
+  funlen:
+    lines: 100
+    statements: 50
+  cyclomatic_complexity:
+    ignores_case_statements: true
 
 linters:
   disable:
     - gochecknoglobals
+    - testpackage
+    #- gomnd
+    #- exhaustive
+    - paralleltest
+    - exhaustivestruct
+    - forbidigo
+    - wrapcheck
   enable-all: true
-
-skip-dirs:
-  - gin-template

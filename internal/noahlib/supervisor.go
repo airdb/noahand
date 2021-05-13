@@ -135,5 +135,6 @@ func WaitWorkerSignals() {
 	for _, f := range globalGraceFuncs {
 		f()
 	}
+
 	log.Println("worker_end_graceful_shutdown")
 }

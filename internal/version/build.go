@@ -64,6 +64,7 @@ const nullVersion = "0.0.0"
 
 func getDeployVersion(executable string) string {
 	var sb strings.Builder
+
 	cmd := exec.CommandContext(context.Background(), executable, "-version")
 	cmd.Stdout = &sb
 	cmd.Stderr = &sb

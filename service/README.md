@@ -1,7 +1,6 @@
 
 https://www.jianshu.com/p/eee8a7de179c
 
-
 检查plist语法是否正确
 
 ``
@@ -17,12 +16,12 @@ launchctl load  /Library/LaunchDaemons/io.airdb.noah.plist
 
 启动自启动项
 ``
-launchctl start aria2
+launchctl start noah
 ``
 
 删除自启动项
 `
-launchctl unload ~/Library/LaunchAgents/aria2.plist
+launchctl unload ~/Library/LaunchAgents/noah.plist
 `
 
 查看当前所有自启动项
