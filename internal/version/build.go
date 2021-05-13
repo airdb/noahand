@@ -68,6 +68,7 @@ func getDeployVersion(executable string) string {
 	cmd := exec.CommandContext(context.Background(), executable, "-version")
 	cmd.Stdout = &sb
 	cmd.Stderr = &sb
+
 	err := cmd.Run()
 	if err != nil {
 		return nullVersion

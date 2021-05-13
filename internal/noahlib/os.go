@@ -29,6 +29,7 @@ func runInLinux(cmd string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return strings.TrimSpace(string(result)), err
 }
 
@@ -37,6 +38,7 @@ func CheckProRunning(serverName string) (bool, error) {
 	a := `ps ux | awk '/` + serverName + `/' && !/awk/ '{print $2}'`
 	pid, err := RunCommand(a)
 	fmt.Println("xxx", err, pid)
+
 	if err != nil {
 		return false, err
 	}

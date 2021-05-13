@@ -51,6 +51,7 @@ func DoSelfUpdate() {
 	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
 
 	defer httpReader.Close()
+
 	gr, err := gzip.NewReader(httpReader)
 	if err != nil {
 		log.Println(err)
@@ -59,6 +60,7 @@ func DoSelfUpdate() {
 	}
 
 	tr := tar.NewReader(gr)
+
 	for {
 		hdr, err := tr.Next()
 		if err != nil {
@@ -80,12 +82,14 @@ func DoSelfUpdate() {
 			// file written, quit listing loop.
 			break
 		}
+
 		if err != nil {
 			return
 		}
 	}
 
 	defer os.Remove(tmpPath)
+
 	err = exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
 	if err != nil {
 		log.Println(err)
@@ -121,7 +125,9 @@ func Downloader() {
 func InstallProcess() {
 	tmpPath := "/sbin/noah"
 	executable := "/tmp/noah_latest"
+
 	defer os.Remove(tmpPath)
+
 	err := exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
 	if err != nil {
 		log.Println(err)
@@ -143,6 +149,7 @@ func DownloadZip() {
 	client.SetURL(dl)
 
 	start := time.Now()
+
 	httpReader, err := client.Downloader()
 	if err != nil {
 		log.Println(err)

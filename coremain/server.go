@@ -9,7 +9,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 
-	// plug in Caddy modules here
+	// plug in Caddy modules here.
 	_ "github.com/caddyserver/caddy/v2/modules/standard"
 )
 
