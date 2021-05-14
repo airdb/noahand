@@ -1,5 +1,3 @@
-airdb.io/airdb/sailor v0.0.11-0.20210506160742-bad10ffe776e h1:kp2Sbje9mpYFWZJCgPVq/drXooRs/H5ldlXry7t0ObQ=
-airdb.io/airdb/sailor v0.0.11-0.20210506160742-bad10ffe776e/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
 airdb.io/airdb/sailor v0.0.11-0.20210507200443-f3e444916646 h1:Nm8KXe36Gum0/zDas9o8+VXgq7fDUvt/fVH7d3lv5vk=
 airdb.io/airdb/sailor v0.0.11-0.20210507200443-f3e444916646/go.mod h1:jIp9qMKihyLXm2tjUl5XOYk4FFb4hODZo5R75+XxRWc=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=

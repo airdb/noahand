@@ -57,12 +57,12 @@ func GetLocalIP() string {
 func RandomHeartbeat() {
 	for {
 		// rand.Seed(900)
-		maxSleepInterval := 60
+		maxSleepInterval := 300
 
 		// nolint: gosec
 		t := rand.Intn(maxSleepInterval)
 
-		t = 10
+		// t = 10
 		log.Println("sleep time seed", t)
 
 		time.Sleep(time.Duration(t) * time.Second)

@@ -33,4 +33,8 @@ $(PLATFORMS):
 
 .PHONY: release
 release: linux darwin
-	tar czvf release/$(BINARY)_latest.zip release/$(BINARY)-*
+	tar czvf release/$(BINARY)_latest.zip service release/$(BINARY)-*
+
+installer:
+	tar czvf release/$(BINARY)_latest.zip service release/$(BINARY)-*
+	cat service/self_extracting_script.sh release/noah_latest.zip  > /tmp/install.sh

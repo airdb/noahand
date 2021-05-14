@@ -1,7 +1,6 @@
 package noahlib
 
 import (
-	"airdb.io/airdb/sailor"
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
@@ -19,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"airdb.io/airdb/sailor"
 	"airdb.io/airdb/sailor/fileutil"
 )
 
