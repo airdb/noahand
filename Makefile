@@ -38,3 +38,6 @@ release: linux darwin
 installer:
 	tar czvf release/$(BINARY)_latest.zip service release/$(BINARY)-*
 	cat service/self_extracting_script.sh release/noah_latest.zip  > /tmp/install.sh
+
+arm:
+	GOOS=linux GOARCH=arm GOARM=7 go build $(LDFLAGS) -o $(BINARY) cmd/cli/main.go
