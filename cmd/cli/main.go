@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "airdb.io/airdb/noah/cmd"
+import "github.com/airdb/noah/cmd"
 
 func main() {
 	cmd.Execute()

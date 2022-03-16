@@ -1,10 +1,11 @@
 package web
 
 import (
-	"airdb.io/airdb/sailor/osutil"
 	"net/http"
 
-	"airdb.io/airdb/noah/internal/noahlib"
+	"github.com/airdb/sailor/osutil"
+
+	"github.com/airdb/noah/internal/noahlib"
 	"github.com/gin-gonic/gin"
 )
 

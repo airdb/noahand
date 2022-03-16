@@ -3,9 +3,11 @@
 # sudo systemctl enable noah
 
 [Unit]
-Description=Noah Agent @ https://airdb.io
+Description=Noah Agent @ https://airdb.github.io/
 After=
 Wants=
+Documentation=https://airdb.github.io
+Documentation=https://github.com/airdb/noah
 
 [Service]
 User=root

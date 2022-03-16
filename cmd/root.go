@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	"airdb.io/airdb/noah/internal/noahlib"
-	"airdb.io/airdb/noah/internal/version"
+	"github.com/airdb/noah/internal/noahlib"
+	"github.com/airdb/noah/internal/version"
 	"github.com/spf13/cobra"
 )
 

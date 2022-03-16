@@ -1,7 +1,7 @@
 package noahlib
 
 import (
-	"airdb.io/airdb/noah/internal/version"
+	"github.com/airdb/noah/internal/version"
 	"airdb.io/airdb/sailor"
 	"fmt"
 	"log"

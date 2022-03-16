@@ -3,7 +3,7 @@ package coremain
 import (
 	"log"
 
-	"airdb.io/airdb/noah/coremain/web"
+	"github.com/airdb/noah/coremain/web"
 	"github.com/caddyserver/caddy/v2"
 	caddycmd "github.com/caddyserver/caddy/v2/cmd"
 	"github.com/gin-contrib/pprof"

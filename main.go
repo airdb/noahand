@@ -1,7 +1,7 @@
 package main
 
 import (
-	"airdb.io/airdb/noah/api"
+	"github.com/airdb/noah/api"
 )
 
 func main() {

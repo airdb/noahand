@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"airdb.io/airdb/noah/coremain"
+	"github.com/airdb/noah/coremain"
 	"github.com/spf13/cobra"
 )
 

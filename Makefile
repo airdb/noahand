@@ -3,7 +3,7 @@ VERSION:=$(shell git describe --dirty --always)
 BUILD := $(shell git rev-parse HEAD)
 
 SYSTEM:=
-REPO := airdb.io/airdb/noah
+REPO := github.com/airdb/noah
 
 LDFLAGS=-ldflags
 LDFLAGS += "-X=$(REPO)/internal/version.Repo=$(REPO) \
