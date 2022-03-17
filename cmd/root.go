@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/airdb/noah/internal/noahlib"
-	"github.com/airdb/noah/internal/version"
+	"github.com/airdb/sailor/version"
 	"github.com/spf13/cobra"
 )
 
@@ -57,7 +57,7 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	rootCmd.Version = version.ToString()
+	rootCmd.Version = version.GetBuildInfo().ToString()
 	rootCmd.AddCommand(updateCmd)
 	initRun()
 

@@ -10,8 +10,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/airdb/noah/internal/version"
 	"github.com/airdb/sailor"
+	"github.com/airdb/sailor/version"
 )
 
 type HostReq struct {
