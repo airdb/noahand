@@ -6,10 +6,11 @@ SYSTEM:=
 REPO := github.com/airdb/noah
 
 LDFLAGS=-ldflags
-LDFLAGS += "-X=$(REPO)/internal/version.Repo=$(REPO) \
-            -X=$(REPO)/internal/version.Version=$(VERSION) \
-            -X=$(REPO)/internal/version.Build=$(BUILD) \
-            -X=$(REPO)/internal/version.BuildTime=$(shell date +%s)"
+LDFLAGS=-ldflags
+LDFLAGS += "-X=github.com/airdb/sailor/version.Repo=$(REPO) \
+            -X=github.com/airdb/sailor/version.Version=$(VERSION) \
+            -X=github.com/airdb/sailor/version.Build=$(BUILD) \
+            -X=github.com/airdb/sailor/version.BuildTime=$(shell date +%s)"
 
 .PHONY: test
 
@@ -20,7 +21,6 @@ test:
 
 build:
 	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o main main.go
-	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY) cmd/cli/main.go
 	#$(SYSTEM) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
 
 PLATFORMS := windows linux darwin

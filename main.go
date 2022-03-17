@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/airdb/noah/api"
-)
+import "github.com/airdb/noah/cmd"
 
 func main() {
-	api.Run()
+	cmd.Execute()
 }

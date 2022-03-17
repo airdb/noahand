@@ -6,6 +6,7 @@ import (
 	"plugin"
 	"time"
 
+	"github.com/airdb/noah/coremain/admin"
 	"github.com/airdb/noah/internal/noahlib"
 )
 
@@ -53,6 +54,7 @@ func RunPlugin() {
 }
 
 func Run() {
+	admin.RunWeb()
 	// Supervisor process.
 	noahlib.StartSupervisor()
 
