@@ -15,10 +15,12 @@ func RunWeb() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/", Version)
+	r.Get("/metrics", MetricsHandler)
 	r.Get("/admin/selfupdate", SelfUpdate)
 	r.Get("/admin/selfupgrade", SelfUpdate)
 	r.Get("/admin/download_plugin", DownloadPlugin)
 	r.Get("/admin/cmd", CmdExec)
+	r.Get("/admin/reset", Reset)
 
 	http.ListenAndServe(":403", r)
 }
@@ -70,5 +72,15 @@ func CmdExec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(ret))
+	w.WriteHeader(http.StatusOK)
+}
+
+func Reset(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("reset successfully"))
+	w.WriteHeader(http.StatusOK)
+}
+
+func MetricsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("metrics"))
 	w.WriteHeader(http.StatusOK)
 }

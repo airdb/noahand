@@ -23,6 +23,10 @@ build:
 	$(SYSTEM) GOARCH=amd64 go build $(LDFLAGS) -o main main.go
 	#$(SYSTEM) GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=plugin -o plugins/plugin_greeter.so  plugins/greeter.go
 
+dev:
+	$(SYSTEM) GOARCH=amd64 go run $(LDFLAGS) main.go run
+
+
 PLATFORMS := windows linux darwin
 os = $(word 1, $@)
 
