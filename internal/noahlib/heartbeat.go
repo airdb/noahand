@@ -1,8 +1,6 @@
 package noahlib
 
 import (
-	"github.com/airdb/noah/internal/version"
-	"airdb.io/airdb/sailor"
 	"fmt"
 	"log"
 	"math/rand"
@@ -11,6 +9,9 @@ import (
 	"os/user"
 	"runtime"
 	"time"
+
+	"github.com/airdb/noah/internal/version"
+	"github.com/airdb/sailor"
 )
 
 type HostReq struct {

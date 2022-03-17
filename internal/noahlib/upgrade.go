@@ -18,8 +18,8 @@ import (
 	"strings"
 	"time"
 
-	"airdb.io/airdb/sailor"
-	"airdb.io/airdb/sailor/fileutil"
+	"github.com/airdb/sailor"
+	"github.com/airdb/sailor/fileutil"
 )
 
 func DoSelfUpdate() {
