@@ -1,17 +1,13 @@
 package coremain
 
 import (
+	"guardhouse/pkg/configkit"
 	"log"
 	"plugin"
 )
 
 func RunPlugin() {
-	pluginMap := map[string]string{
-		"output/01_plugin.so": "Plugin01",
-		"output/02_plugin.so": "Plugin02",
-	}
-
-	for pluginPath, pluginName := range pluginMap {
+	for pluginPath, pluginName := range configkit.PluginMap {
 		plugin, err := plugin.Open(pluginPath)
 		if err != nil {
 			log.Println("Error loading plugin:", err)

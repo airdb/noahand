@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	HomeDir = "/opt/noah/"
+	HomeDir       = "/opt/noah/"
 	DefaultDomain = "https://aid.run"
 	// DefaultDomain = "http://127.0.0.1:8080"
 )

@@ -7,9 +7,15 @@ import (
 	"runtime"
 )
 
+var PluginMap = map[string]string{
+	"output/01_plugin.so": "Plugin01",
+	"output/02_plugin.so": "Plugin02",
+	"output/03_plugin.so": "Plugin03",
+}
+
 var (
 	HomeDir = "/opt/noah/"
-	//DefaultDomain = "https://aid.run"
+	// DefaultDomain = "https://aid.run"
 	DefaultDomain = "http://127.0.0.1:8080"
 )
 

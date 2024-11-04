@@ -10,6 +10,8 @@ import (
 
 // Main function of the plugin.
 func Plugin02() {
+	log.SetFlags(log.Lshortfile)
+	log.Println("Hello from Plugin 02!")
 	// Create a new resty client
 	client := resty.New()
 

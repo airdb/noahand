@@ -8,7 +8,11 @@ import (
 )
 
 func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("pong\n"))
+	_, err := w.Write([]byte("pong\n"))
+	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func APIListHandler(w http.ResponseWriter, _ *http.Request) {
@@ -20,7 +24,11 @@ func APIListHandler(w http.ResponseWriter, _ *http.Request) {
 	msg += "/internal/noah/cmd\n"
 	msg += "/internal/noah/exec\n"
 
-	w.Write([]byte(msg))
+	_, err := w.Write([]byte(msg))
+	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func RuntimeHandler(w http.ResponseWriter, _ *http.Request) {

@@ -7,5 +7,6 @@ import (
 
 // Main function of the plugin.
 func Plugin01() {
-	log.Println("Hello from PluginA!")
+	log.SetFlags(log.Lshortfile)
+	log.Println("Hello from Plugin 01!")
 }
