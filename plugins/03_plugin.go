@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 )
 
@@ -46,24 +47,46 @@ func Plugin03() {
 	}
 }
 
-// Setup cgroup limits
 func setupCgroup(pid int) error {
-	// Create cgroup
-	cgroupPath := "/sys/fs/cgroup/memory/mycontainer"
-	if err := os.MkdirAll(cgroupPath, 0755); err != nil {
-		return err
+	// Define cgroup base path
+	cgroupBasePath := "/sys/fs/cgroup"
+
+	// Memory controller path
+	memoryCgroupPath := filepath.Join(cgroupBasePath, "memory", "mycontainer")
+	if err := os.MkdirAll(memoryCgroupPath, 0755); err != nil {
+		return fmt.Errorf("failed to create memory cgroup directory: %v", err)
 	}
 
-	// Set memory limit (e.g., 100MB)
-	if err := os.WriteFile(cgroupPath+"/memory.limit_in_bytes", []byte("104857600"), 0644); err != nil {
-		return err
+	// Set memory limit to 100MB
+	if err := os.WriteFile(filepath.Join(memoryCgroupPath, "memory.limit_in_bytes"), []byte("104857600"), 0644); err != nil {
+		return fmt.Errorf("failed to set memory limit: %v", err)
 	}
 
-	// Set CPU limit (e.g., 50% CPU)
-	if err := os.WriteFile(cgroupPath+"/cpu.cfs_quota_us", []byte("1000"), 0644); err != nil {
-		return err
+	// Add process to memory cgroup
+	if err := os.WriteFile(filepath.Join(memoryCgroupPath, "tasks"), []byte(fmt.Sprintf("%d", pid)), 0644); err != nil {
+		return fmt.Errorf("将进程添加到内存 cgroup 失败: %v", err)
 	}
 
-	// Add process to cgroup
-	return os.WriteFile(cgroupPath+"/tasks", []byte(fmt.Sprintf("%d", pid)), 0644)
+	// CPU 控制器路径
+	cpuCgroupPath := filepath.Join(cgroupBasePath, "cpu", "mycontainer")
+	if err := os.MkdirAll(cpuCgroupPath, 0755); err != nil {
+		return fmt.Errorf("创建 CPU cgroup 目录失败: %v", err)
+	}
+
+	// 设置 CPU 调度周期为 100ms
+	if err := os.WriteFile(filepath.Join(cpuCgroupPath, "cpu.cfs_period_us"), []byte("100000"), 0644); err != nil {
+		return fmt.Errorf("设置 CPU 调度周期失败: %v", err)
+	}
+
+	// 设置 CPU 配额为 50ms，表示 50% 的 CPU 使用率
+	if err := os.WriteFile(filepath.Join(cpuCgroupPath, "cpu.cfs_quota_us"), []byte("50000"), 0644); err != nil {
+		return fmt.Errorf("设置 CPU 配额失败: %v", err)
+	}
+
+	// 将进程添加到 CPU cgroup
+	if err := os.WriteFile(filepath.Join(cpuCgroupPath, "tasks"), []byte(fmt.Sprintf("%d", pid)), 0644); err != nil {
+		return fmt.Errorf("将进程添加到 CPU cgroup 失败: %v", err)
+	}
+
+	return nil
 }
