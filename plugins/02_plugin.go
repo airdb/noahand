@@ -13,9 +13,8 @@ func Plugin02() {
 	// Create a new resty client
 	client := resty.New()
 
-	// Make GET request to sg.airdb.host:8000
-	resp, err := client.R().
-		Get(noahlib.DefaultDomain + "/info")
+	// Make GET request to server
+	resp, err := client.R().Get(noahlib.GetHostHeartbeatURL())
 	if err != nil {
 		log.Printf("Error making request: %v\n", err)
 

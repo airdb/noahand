@@ -10,7 +10,7 @@ Wants=
 [Service]
 User=root
 Group=root
-ExecStart=/srv/noah/bin/noah run
+ExecStart=/opt/noah/bin/noah run
 Restart=always
 RestartSec=20
 KillSignal=SIGTERM

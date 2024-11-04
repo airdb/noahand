@@ -1,4 +1,4 @@
-package noahlib
+package configkit
 
 import (
 	"net"

@@ -1,47 +1,25 @@
 package noahlib
 
 import (
-	"guardhouse/internal/version"
 	"log"
 	"math/rand"
-	"net"
 	"net/http"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 )
 
-type HostReq struct {
-	IP        string `url:"ip"`
-	OS        string `url:"os"`
-	Hostname  string `url:"hostname"`
-	Timestamp string `url:"timestamp"`
-	Arch      string `url:"arch"`
-	IsStart   string `url:"is_start,omitempty"`
-	Username  string `url:"username"`
-	Version   string `url:"version"`
+type HostHeartbeatReq struct {
+	IP          string `json:"ip" url:"ip"`
+	Hostname    string `json:"hostname" url:"hostname"`
+	Arch        string `json:"arch" url:"arch"`
+	OS          string `json:"os" url:"os"`
+	Kernel      string `json:"kernel" url:"kernel"`
+	SystemInfo  string `json:"system_info" url:"system_info"`
+	Environment string `json:"environment" url:"environment"`
 }
 
-type HostResp struct{}
-
-// GetLocalIP returns the non loopback local IP of the host.
-func GetLocalIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return ""
-	}
-
-	for _, address := range addrs {
-		// check the address type and if it is not a loopback the display it
-		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				return ipnet.IP.String()
-			}
-		}
-	}
-
-	return ""
-}
+type HostHeartbeatResp struct{}
 
 func RandomHeartbeat() {
 	for {
@@ -67,13 +45,23 @@ func RandomHeartbeat() {
 
 func Heartbeat() {
 	client := resty.New()
+
+	req := &HostHeartbeatReq{
+		IP:          GetLocalIP(),
+		Hostname:    GetHostname(),
+		Arch:        GetArch(),
+		OS:          GetOS(),
+		Kernel:      GetKernel(),
+		SystemInfo:  GetSystemInfo(),
+		Environment: GetEnvironment(),
+	}
+
+	log.Printf("Heartbeat request: %+v", req)
+
 	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
-		SetBody(map[string]any{
-			"ip":      GetLocalIP(),
-			"version": version.ToString(),
-		}).
-		Post(GetConfigURL())
+		SetBody(req).
+		Post(GetHostHeartbeatURL())
 	if err != nil {
 		log.Printf("Failed to send heartbeat: %v", err)
 
@@ -81,6 +69,7 @@ func Heartbeat() {
 	}
 
 	if resp.StatusCode() != http.StatusOK {
+		log.Printf("Response body: %s", resp.String())
 		log.Printf("Heartbeat request failed with status: %d", resp.StatusCode())
 
 		return

@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"sync"
 	"syscall"
@@ -13,8 +12,7 @@ import (
 )
 
 func setProcessName(name string) {
-	argv0str := (*reflect.StringHeader)(unsafe.Pointer(&os.Args[0]))
-	argv0 := (*[1 << 30]byte)(unsafe.Pointer(argv0str.Data))[:len(name)+1]
+	argv0 := (*[1 << 30]byte)(unsafe.Pointer(unsafe.StringData(os.Args[0])))[:len(name)+1]
 
 	n := copy(argv0, name+"\x00")
 	if n < len(argv0) {
