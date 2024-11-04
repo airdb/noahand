@@ -1,7 +1,7 @@
 main
 noah
-noah
-plugins/*.so
+guardhouse
+output
 docs
 .idea/
 conf

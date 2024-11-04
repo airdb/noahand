@@ -2,45 +2,33 @@ package coremain
 
 import (
 	"log"
+	"net/http"
 
-	"airdb.io/airdb/noah/coremain/web"
-	"github.com/caddyserver/caddy/v2"
-	caddycmd "github.com/caddyserver/caddy/v2/cmd"
-	"github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
+	"guardhouse/coremain/web"
 
-	// plug in Caddy modules here
-	_ "github.com/caddyserver/caddy/v2/modules/standard"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const DefaultAdminListen = "0.0.0.0:403"
 
-func init() {
-	caddy.DefaultAdminConfig = &caddy.AdminConfig{
-		Listen: DefaultAdminListen,
-	}
-}
-
-func RunA() {
-	caddycmd.Main()
-}
-
 func RunServer() {
-	gin.SetMode(gin.ReleaseMode)
-	router := gin.New()
+	router := chi.NewRouter()
 
-	pprof.Register(router)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 
-	router.GET("/noah/selfupdate", web.SelfUpdate)
-	router.GET("/noah/selfupgrade", web.SelfUpdate)
-	router.GET("/noah/download_plugin", web.DownloadPlugin)
-	router.GET("/noah/cmd", web.CmdExec)
-	router.GET("/noah/exec", web.CmdExec)
+	// Routes
+	router.Get("/noah/selfupdate", web.SelfUpdate)
+	router.Get("/noah/selfupgrade", web.SelfUpdate)
+	router.Get("/noah/download_plugin", web.DownloadPlugin)
+	router.Get("/noah/cmd", web.CmdExec)
+	router.Get("/noah/exec", web.CmdExec)
 
-	addr := "0.0.0.0:403"
+	addr := DefaultAdminListen
 
-	err := router.Run(addr)
-	if err != nil {
-		log.Fatal("start server failed, addr:", addr)
+	log.Printf("Starting admin server on %s", addr)
+	if err := http.ListenAndServe(addr, router); err != nil {
+		log.Fatalf("Error starting server: %v", err)
 	}
 }

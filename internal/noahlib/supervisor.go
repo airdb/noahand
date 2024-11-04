@@ -28,10 +28,10 @@ func StartSupervisor() {
 
 	// deep copy os.Args & os.Environ
 	osArgs := strings.Split(strings.Join(os.Args, "\x00"), "\x00")
-	osEnviron := strings.Split(strings.Join(os.Environ(), "\x00")+"\x00supervisor=0", "\x00")
+	osEnviron := strings.Split(strings.Join(os.Environ(), "\x00")+"\x00master=0", "\x00")
 
-	if os.Getenv("supervisor") != "0" {
-		setProcessName(filepath.Base(executable) + ": supervisor process " + executable)
+	if os.Getenv("master") != "0" {
+		setProcessName(filepath.Base(executable) + ":master process " + executable)
 	} else {
 		setProcessName(filepath.Base(executable) + ": worker process " + executable)
 
@@ -83,7 +83,7 @@ func StartSupervisor() {
 			}
 			os.Exit(0)
 		case syscall.SIGHUP:
-			log.Println("supervisor_start_worker")
+			log.Println("master start worker")
 
 			go supervisor()
 		}
@@ -118,7 +118,7 @@ func WaitWorkerSignals() {
 
 	switch <-c {
 	case syscall.SIGTERM, syscall.SIGINT:
-		log.Println("worker_received_exited_signal")
+		log.Println("worker received exited signal")
 		for _, f := range globalExitFuncs {
 			f()
 		}
@@ -131,9 +131,9 @@ func WaitWorkerSignals() {
 
 	executable, _ := os.Executable()
 	setProcessName(filepath.Base(executable) + ": worker process (graceful shutdown)")
-	log.Println("worker_start_graceful_shutdown")
+	log.Println("worker start graceful shutdown")
 	for _, f := range globalGraceFuncs {
 		f()
 	}
-	log.Println("worker_end_graceful_shutdown")
+	log.Println("worker end graceful shutdown")
 }

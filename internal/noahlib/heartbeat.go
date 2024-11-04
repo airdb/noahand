@@ -1,16 +1,15 @@
 package noahlib
 
 import (
-	"fmt"
-	"guardhouse/internal/sailor"
-	"guardhouse/internal/version"
 	"log"
 	"math/rand"
 	"net"
-	"os"
-	"os/user"
-	"runtime"
+	"net/http"
 	"time"
+
+	"guardhouse/internal/version"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type HostReq struct {
@@ -78,30 +77,24 @@ func RandomHeartbeat() {
 }
 
 func Heartbeat() {
-	client := sailor.HTTPClient{}
-	client.SetURL(GetConfigURL())
+	client := resty.New()
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]interface{}{
+			"ip":      GetLocalIP(),
+			"version": version.ToString(),
+		}).
+		Post(GetConfigURL())
 
-	hostname, _ := os.Hostname()
-	user, _ := user.Current()
-
-	input := &HostReq{
-		OS:        runtime.GOOS,
-		Arch:      runtime.GOARCH,
-		IP:        GetLocalIP(),
-		Hostname:  hostname,
-		Timestamp: fmt.Sprintf("%v", time.Now().Unix()),
-		Username:  user.Username,
-		Version:   version.Version,
-	}
-
-	client.SetBody(&input)
-
-	client.SetUserAgent(fmt.Sprintf("%s/%s", version.Repo, version.Version))
-
-	var output HostResp
-
-	err := client.HTTPRequest(&client, &output)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Failed to send heartbeat: %v", err)
+		return
 	}
+
+	if resp.StatusCode() != http.StatusOK {
+		log.Printf("Heartbeat request failed with status: %d", resp.StatusCode())
+		return
+	}
+
+	log.Printf("Heartbeat sent successfully")
 }

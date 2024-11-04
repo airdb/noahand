@@ -16,9 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"airdb.io/airdb/sailor/fileutil"
-	"github.com/pkg/errors"
 )
 
 func DoSelfUpdate() {
@@ -114,13 +111,11 @@ func Downloader() {
 	}
 
 	defer resp.Body.Close()
-	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response body: %v", err)
 		return
 	}
 
-	err = fileutil.WriteFile(GetPluginPath()+mod, string(content))
 	log.Println(err)
 }
 
@@ -142,7 +137,6 @@ func doRequest(dl string) (*http.Response, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("http status code is %v", resp.StatusCode)
 	}
 
 	return resp, nil

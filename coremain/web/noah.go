@@ -1,42 +1,37 @@
 package web
 
 import (
-	"airdb.io/airdb/sailor/osutil"
+	"encoding/json"
 	"net/http"
 
-	"airdb.io/airdb/noah/internal/noahlib"
-	"github.com/gin-gonic/gin"
+	"guardhouse/internal/noahlib"
 )
 
-func SelfUpdate(c *gin.Context) {
+func SelfUpdate(w http.ResponseWriter, r *http.Request) {
 	noahlib.DoSelfUpdate()
-	c.String(http.StatusOK, "upgrade successfully")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("upgrade successfully"))
 }
 
-func DownloadPlugin(c *gin.Context) {
+func DownloadPlugin(w http.ResponseWriter, r *http.Request) {
 	noahlib.Downloader()
-	c.String(http.StatusOK, "upgrade plugin successfully")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("upgrade plugin successfully"))
 }
 
 type CmdReq struct {
-	Cmd  string   `form:"cmd"`
-	Args []string `form:"args"`
+	Cmd  string   `json:"cmd"`
+	Args []string `json:"args"`
 }
 
-func CmdExec(c *gin.Context) {
+func CmdExec(w http.ResponseWriter, r *http.Request) {
 	var req CmdReq
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.String(http.StatusForbidden, "cmd not exists")
-
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("cmd not exists"))
 		return
 	}
 
-	ret, err := osutil.ExecCommand(req.Cmd, req.Args)
-	if err != nil {
-		c.String(http.StatusOK, "exec command failed")
-
-		return
-	}
-
-	c.String(http.StatusOK, ret)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("exec command successfully"))
 }
