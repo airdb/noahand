@@ -8,7 +8,7 @@ import (
 )
 
 func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("pong"))
+	w.Write([]byte("pong\n"))
 }
 
 func APIListHandler(w http.ResponseWriter, _ *http.Request) {
