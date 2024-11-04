@@ -23,19 +23,24 @@ func Plugin03() {
 	cmd.SysProcAttr = cgroupConfig.SysProcAttr
 	cmd.Env = os.Environ()
 
-	// Set resource limits
+	// Set standard output and error output first
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Start the command (this will initialize cmd.Process)
+	if err := cmd.Start(); err != nil {
+		log.Printf("Command start failed: %v\n", err)
+		return
+	}
+
+	// Now we can safely access cmd.Process.Pid
 	if err := setupCgroup(cmd.Process.Pid); err != nil {
 		log.Printf("Failed to setup cgroup: %v\n", err)
 		return
 	}
 
-	// Set standard output and error output
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	// Execute command
-	err := cmd.Run()
-	if err != nil {
+	// Wait for the command to complete
+	if err := cmd.Wait(); err != nil {
 		log.Printf("Command execution failed: %v\n", err)
 		return
 	}
