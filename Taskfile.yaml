@@ -14,8 +14,8 @@ tasks:
   build-plugin:
     desc: Generate plugin
     cmds:
-      - go build -buildmode=plugin -o output/01_plugin.so plugins/01_plugin.go
-      - go build -buildmode=plugin -o output/02_plugin.so plugins/02_plugin.go
+      - CGO_ENABLED=1 go build -buildmode=plugin -o output/01_plugin.so plugins/01_plugin.go
+      - CGO_ENABLED=1 go build -buildmode=plugin -o output/02_plugin.so plugins/02_plugin.go
 
   run:
     desc: Run guardhouse locally
@@ -27,6 +27,15 @@ tasks:
     cmds:
       - go build -o main main.go
 
+  docker-build:
+    desc: Build guardhouse binary by docker
+    cmds:
+      - docker compose up --build
+
+  run-plugin:
+    desc: Run guardhouse plugin mode
+    cmds:
+      - go run main.go plugin
   run-plugin:
     desc: Run guardhouse plugin mode
     cmds:

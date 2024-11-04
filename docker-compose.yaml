@@ -1,0 +1,15 @@
+services:
+  guardhouse:
+    container_name: guardhouse
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "airdb/guardhouse:latest"
+    #command: sleep 3600
+    command: cp -pr /app/output /srv/output/ &&  echo "build complete"
+    volumes:
+      - ./output:/srv/output/
+    ports:
+      - "8080:8080"
+    environment:
+      - env=test

@@ -25,6 +25,7 @@ func RandomHeartbeat() {
 	for {
 		// rand.Seed(900)
 		maxSleepInterval := 60
+		maxSleepInterval = 900
 
 		t := rand.Intn(maxSleepInterval)
 
