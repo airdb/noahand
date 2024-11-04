@@ -7,7 +7,23 @@ import (
 	"net/http"
 )
 
-func DefaultRoot(w http.ResponseWriter, _ *http.Request) {
+func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Write([]byte("pong"))
+}
+
+func APIListHandler(w http.ResponseWriter, _ *http.Request) {
+	msg := "api list:\n"
+	msg += "/internal/noah/host\n"
+	msg += "/internal/noah/selfupdate\n"
+	msg += "/internal/noah/selfupgrade\n"
+	msg += "/internal/noah/download_plugin\n"
+	msg += "/internal/noah/cmd\n"
+	msg += "/internal/noah/exec\n"
+
+	w.Write([]byte(msg))
+}
+
+func RuntimeHandler(w http.ResponseWriter, _ *http.Request) {
 	response := map[string]any{
 		"deploy_info": version.GetBuildInfo(),
 	}
