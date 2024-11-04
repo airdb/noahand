@@ -1,11 +1,19 @@
-package web
+package admin
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"guardhouse/internal/noahlib"
+	"guardhouse/internal/version"
 )
+
+func DefaultRoot(w http.ResponseWriter, r *http.Request) {
+	response := map[string]interface{}{
+		"deploy_info": version.GetBuildInfo(),
+	}
+	json.NewEncoder(w).Encode(response)
+}
 
 func SelfUpdate(w http.ResponseWriter, r *http.Request) {
 	noahlib.DoSelfUpdate()

@@ -1,10 +1,8 @@
-package coremain
+package admin
 
 import (
 	"log"
 	"net/http"
-
-	"guardhouse/coremain/web"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -19,11 +17,18 @@ func RunServer() {
 	router.Use(middleware.Recoverer)
 
 	// Routes
-	router.Get("/noah/selfupdate", web.SelfUpdate)
-	router.Get("/noah/selfupgrade", web.SelfUpdate)
-	router.Get("/noah/download_plugin", web.DownloadPlugin)
-	router.Get("/noah/cmd", web.CmdExec)
-	router.Get("/noah/exec", web.CmdExec)
+	// Serve static files
+	fileServer := http.FileServer(http.Dir("./release"))
+	router.Handle("/release/*", http.StripPrefix("/release/", fileServer))
+
+	router.Get("/", DefaultRoot)
+	router.Get("/host", DefaultRoot)
+
+	router.Get("/noah/selfupdate", SelfUpdate)
+	router.Get("/noah/selfupgrade", SelfUpdate)
+	router.Get("/noah/download_plugin", DownloadPlugin)
+	router.Get("/noah/cmd", CmdExec)
+	router.Get("/noah/exec", CmdExec)
 
 	addr := DefaultAdminListen
 

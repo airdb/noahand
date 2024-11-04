@@ -1,7 +1,9 @@
 package main
 
-import "guardhouse/coremain"
+import (
+	"guardhouse/cmd"
+)
 
 func main() {
-	coremain.RunPlugin()
+	cmd.Execute()
 }

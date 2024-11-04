@@ -33,7 +33,7 @@ func StartSupervisor() {
 	if os.Getenv("master") != "0" {
 		setProcessName(filepath.Base(executable) + ":master process " + executable)
 	} else {
-		setProcessName(filepath.Base(executable) + ": worker process " + executable)
+		setProcessName(filepath.Base(executable) + ":worker process " + executable)
 
 		return
 	}
