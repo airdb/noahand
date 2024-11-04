@@ -1,9 +1,9 @@
 package main
 
 import (
-	"airdb.io/airdb/noah/api"
+	"guardhouse/core"
 )
 
 func main() {
-	api.Run()
+	core.RunPlugin()
 }

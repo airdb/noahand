@@ -114,7 +114,11 @@ func Downloader() {
 	}
 
 	defer resp.Body.Close()
-	content, _ := ioutil.ReadAll(resp.Body)
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Failed to read response body: %v", err)
+		return
+	}
 
 	err = fileutil.WriteFile(GetPluginPath()+mod, string(content))
 	log.Println(err)

@@ -1,13 +1,5 @@
-module airdb.io/airdb/noah
+module guardhouse
 
-go 1.16
+go 1.23
 
-require (
-	airdb.io/airdb/sailor v0.0.11
-	github.com/caddyserver/caddy/v2 v2.3.0
-	github.com/gin-contrib/pprof v1.3.0
-	github.com/gin-gonic/gin v1.6.3
-	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.1.3
-	golang.org/x/sys v0.0.0-20210314195730-07df6a141424 // indirect
-)
+require github.com/go-chi/chi/v5 v5.1.0 // indirect

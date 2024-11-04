@@ -1,9 +1,9 @@
 package noahlib
 
 import (
-	"airdb.io/airdb/noah/internal/version"
-	"airdb.io/airdb/sailor"
 	"fmt"
+	"guardhouse/internal/sailor"
+	"guardhouse/internal/version"
 	"log"
 	"math/rand"
 	"net"
