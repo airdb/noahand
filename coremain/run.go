@@ -12,13 +12,17 @@ func Run() {
 	// Supervisor process.
 	noahlib.StartSupervisor()
 	go admin.RunServer()
-	noahlib.WaitWorkerSignals()
 
 	// Worker process.
-	for {
-		noahlib.DoSelfUpdate()
-		log.Println("self update")
-		time.Sleep(time.Minute)
-	}
+	go func() {
+		for {
+			RunPlugin()
+			log.Println("plugin run")
+			//noahlib.DoSelfUpdate()
+			// log.Println("self update")
+			time.Sleep(time.Minute)
+		}
+	}()
 
+	noahlib.WaitWorkerSignals()
 }

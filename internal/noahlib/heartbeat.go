@@ -26,14 +26,6 @@ type HostReq struct {
 type HostResp struct {
 }
 
-const (
-	DefaultDomain = "http://sg.airdb.host"
-)
-
-func GetConfigURL() string {
-	return DefaultDomain + "/host"
-}
-
 // GetLocalIP returns the non loopback local IP of the host.
 func GetLocalIP() string {
 	addrs, err := net.InterfaceAddrs()
@@ -58,10 +50,9 @@ func RandomHeartbeat() {
 		// rand.Seed(900)
 		maxSleepInterval := 60
 
-		// nolint: gosec
 		t := rand.Intn(maxSleepInterval)
 
-		t = 10
+		// t = 10
 		log.Println("sleep time seed", t)
 
 		time.Sleep(time.Duration(t) * time.Second)
