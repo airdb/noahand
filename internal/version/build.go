@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const nullVersion = "0.0.0"
+
 // Build version info.
 type BuildInfo struct {
 	GoVersion string
@@ -60,10 +62,9 @@ func ToString() string {
 	return string(out)
 }
 
-const nullVersion = "0.0.0"
-
 func getDeployVersion(executable string) string {
 	var stringBuilder strings.Builder
+
 	cmd := exec.CommandContext(context.Background(), executable, "-version")
 	cmd.Stdout = &stringBuilder
 	cmd.Stderr = &stringBuilder

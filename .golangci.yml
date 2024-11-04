@@ -1,12 +1,16 @@
-run:
-  go: '1.20'
-
-linters-settings:
-  gocritic:
-    disabled-checks:
-      - singleCaseSwitch
+# NOTE(@andreynering): The linters listed here are additions on top of
+# those enabled by default:
+#
+# https://golangci-lint.run/usage/linters/#enabled-by-default
 
 linters:
-  disable:
-    - gochecknoglobals
-  enable-all: true
+  enable:
+    - goimports
+    - gofmt
+    - gofumpt
+
+linters-settings:
+  gofmt:
+    rewrite-rules:
+      - pattern: 'interface{}'
+        replacement: 'any'

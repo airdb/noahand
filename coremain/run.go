@@ -1,16 +1,16 @@
 package coremain
 
 import (
+	"guardhouse/internal/admin"
+	"guardhouse/internal/noahlib"
 	"log"
 	"time"
-
-	"guardhouse/coremain/admin"
-	"guardhouse/internal/noahlib"
 )
 
 func Run() {
 	// Supervisor process.
 	noahlib.StartSupervisor()
+
 	go admin.RunServer()
 
 	// Worker process.
@@ -18,7 +18,7 @@ func Run() {
 		for {
 			RunPlugin()
 			log.Println("plugin run")
-			//noahlib.DoSelfUpdate()
+			// noahlib.DoSelfUpdate()
 			// log.Println("self update")
 			time.Sleep(time.Minute)
 		}

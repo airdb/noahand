@@ -1,9 +1,11 @@
 // pluginA.go
 package main
 
-import "fmt"
+import (
+	"log"
+)
 
-// 插件的导出函数
+// Main function of the plugin.
 func Plugin01() {
-	fmt.Println("Hello from PluginA!")
+	log.Println("Hello from PluginA!")
 }

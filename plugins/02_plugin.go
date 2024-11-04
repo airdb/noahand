@@ -2,12 +2,13 @@
 package main
 
 import (
-	"fmt"
 	"guardhouse/internal/noahlib"
+	"log"
 
 	"github.com/go-resty/resty/v2"
 )
 
+// Main function of the plugin.
 func Plugin02() {
 	// Create a new resty client
 	client := resty.New()
@@ -15,13 +16,13 @@ func Plugin02() {
 	// Make GET request to sg.airdb.host:8000
 	resp, err := client.R().
 		Get(noahlib.DefaultDomain + "/info")
-
 	if err != nil {
-		fmt.Printf("Error making request: %v\n", err)
+		log.Printf("Error making request: %v\n", err)
+
 		return
 	}
 
-	// Print the response
-	fmt.Printf("Response Status: %v\n", resp.Status())
-	fmt.Printf("Response Body: %s\n", resp.String())
+	// Log the response
+	log.Printf("Response Status: %v\n", resp.Status())
+	log.Printf("Response Body: %s\n", resp.String())
 }

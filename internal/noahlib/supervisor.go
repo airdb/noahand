@@ -39,7 +39,9 @@ func StartSupervisor() {
 	}
 
 	var childs []*os.Process
+
 	var supervisor func()
+
 	supervisor = func() {
 		p, err := os.StartProcess(executable, osArgs, &os.ProcAttr{
 			Dir:   ".",
@@ -60,8 +62,9 @@ func StartSupervisor() {
 
 		ps, err := p.Wait()
 		if err != nil {
-			println(err.Error())
+			log.Println(err.Error())
 		}
+
 		if ps != nil && !ps.Success() {
 			go supervisor()
 		}
@@ -70,17 +73,18 @@ func StartSupervisor() {
 	go supervisor()
 	go RandomHeartbeat()
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGTERM)
-	signal.Notify(c, syscall.SIGINT)
-	signal.Notify(c, syscall.SIGHUP)
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGTERM)
+	signal.Notify(signalChan, syscall.SIGINT)
+	signal.Notify(signalChan, syscall.SIGHUP)
 
 	for {
-		switch sig := <-c; sig {
+		switch sig := <-signalChan; sig {
 		case syscall.SIGTERM, syscall.SIGINT:
 			for _, child := range childs {
 				_ = child.Signal(sig)
 			}
+
 			os.Exit(0)
 		case syscall.SIGHUP:
 			log.Println("master start worker")
@@ -119,9 +123,11 @@ func WaitWorkerSignals() {
 	switch <-c {
 	case syscall.SIGTERM, syscall.SIGINT:
 		log.Println("worker received exited signal")
+
 		for _, f := range globalExitFuncs {
 			f()
 		}
+
 		for _, f := range globalGraceFuncs {
 			f()
 		}
@@ -132,8 +138,10 @@ func WaitWorkerSignals() {
 	executable, _ := os.Executable()
 	setProcessName(filepath.Base(executable) + ": worker process (graceful shutdown)")
 	log.Println("worker start graceful shutdown")
+
 	for _, f := range globalGraceFuncs {
 		f()
 	}
+
 	log.Println("worker end graceful shutdown")
 }

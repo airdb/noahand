@@ -1,13 +1,12 @@
 package noahlib
 
 import (
+	"guardhouse/internal/version"
 	"log"
 	"math/rand"
 	"net"
 	"net/http"
 	"time"
-
-	"guardhouse/internal/version"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -23,8 +22,7 @@ type HostReq struct {
 	Version   string `url:"version"`
 }
 
-type HostResp struct {
-}
+type HostResp struct{}
 
 // GetLocalIP returns the non loopback local IP of the host.
 func GetLocalIP() string {
@@ -71,19 +69,20 @@ func Heartbeat() {
 	client := resty.New()
 	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
-		SetBody(map[string]interface{}{
+		SetBody(map[string]any{
 			"ip":      GetLocalIP(),
 			"version": version.ToString(),
 		}).
 		Post(GetConfigURL())
-
 	if err != nil {
 		log.Printf("Failed to send heartbeat: %v", err)
+
 		return
 	}
 
 	if resp.StatusCode() != http.StatusOK {
 		log.Printf("Heartbeat request failed with status: %d", resp.StatusCode())
+
 		return
 	}
 

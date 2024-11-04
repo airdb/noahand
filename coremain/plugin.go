@@ -1,7 +1,7 @@
 package coremain
 
 import (
-	"fmt"
+	"log"
 	"plugin"
 )
 
@@ -12,23 +12,26 @@ func RunPlugin() {
 	}
 
 	for pluginPath, pluginName := range pluginMap {
-		p, err := plugin.Open(pluginPath)
+		plugin, err := plugin.Open(pluginPath)
 		if err != nil {
-			fmt.Println("Error loading plugin:", err)
+			log.Println("Error loading plugin:", err)
+
 			continue
 		}
 
 		// 查找插件中的 Hello 函数
-		helloSymbol, err := p.Lookup(pluginName)
+		helloSymbol, err := plugin.Lookup(pluginName)
 		if err != nil {
-			fmt.Println("Error finding Hello function:", err)
+			log.Println("Error finding Hello function:", err)
+
 			return
 		}
 
 		// 类型断言并调用 Hello 函数
 		helloFunc, ok := helloSymbol.(func())
 		if !ok {
-			fmt.Println("Error asserting Hello function type")
+			log.Println("Error asserting Hello function type")
+
 			return
 		}
 

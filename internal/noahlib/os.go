@@ -2,6 +2,7 @@ package noahlib
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -12,6 +13,7 @@ func runInWindows(cmd string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to execute command: %w", err)
 	}
+
 	return strings.TrimSpace(string(result)), err
 }
 
@@ -24,11 +26,12 @@ func RunCommand(cmd string) (string, error) {
 }
 
 func runInLinux(cmd string) (string, error) {
-	fmt.Println("Running Linux cmd:" + cmd)
+	log.Println("Running Linux cmd:" + cmd)
 	result, err := exec.Command("/bin/sh", "-c", cmd).Output()
 	if err != nil {
 		return "", fmt.Errorf("failed to execute command: %w", err)
 	}
+
 	return strings.TrimSpace(string(result)), err
 }
 
@@ -36,10 +39,13 @@ func runInLinux(cmd string) (string, error) {
 func CheckProRunning(serverName string) (bool, error) {
 	a := `ps ux | awk '/` + serverName + `/' && !/awk/ '{print $2}'`
 	pid, err := RunCommand(a)
-	fmt.Println("xxx", err, pid)
+
+	log.Println("xxx", err, pid)
+
 	if err != nil {
 		return false, fmt.Errorf("failed to check process running: %w", err)
 	}
+
 	return pid != "", nil
 }
 
@@ -50,5 +56,6 @@ func GetPid(serverName string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get process ID: %w", err)
 	}
+
 	return pid, nil
 }

@@ -26,6 +26,5 @@ func GetPluginPath() string {
 		return path.Join(HomeDir, "plugins")
 	default:
 		panic("unsupported os: " + runtime.GOOS)
-		return ""
 	}
 }

@@ -31,6 +31,7 @@ func DoSelfUpdate() {
 	}
 
 	transport := http.DefaultTransport.(*http.Transport)
+
 	var body io.ReadCloser
 	resp, err := transport.RoundTrip(req)
 	if err != nil {
@@ -50,19 +51,23 @@ func DoSelfUpdate() {
 	executable, err := os.Executable()
 	if err != nil {
 		log.Println("get_executable_fail")
+
 		return
 	}
 
 	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 
 	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
+
 	gzipReader, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
+
 		return
 	}
 
 	tarReader := tar.NewReader(gzipReader)
+
 	for {
 		hdr, err := tarReader.Next()
 		if err != nil {
@@ -76,14 +81,14 @@ func DoSelfUpdate() {
 		// if hdr.Name == executable + runtime.GOOS {
 		if strings.HasSuffix(hdr.Name, name) {
 			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
-			err := os.WriteFile(tmpPath, data, 0755) // #nosec
+			err := os.WriteFile(tmpPath, data, 0o755) // #nosec
 			if err != nil {
-
 				return
 			}
 			// file written, quit listing loop.
 			break
 		}
+
 		if err != nil {
 			return
 		}
@@ -110,8 +115,10 @@ func Downloader() {
 	}
 
 	defer resp.Body.Close()
+
 	if err != nil {
 		log.Printf("Failed to read response body: %v", err)
+
 		return
 	}
 
@@ -136,6 +143,9 @@ func doRequest(dl string) (*http.Response, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
+		log.Println("download server unreachable")
+
+		return nil, fmt.Errorf("download server unreachable")
 	}
 
 	return resp, nil
@@ -144,6 +154,7 @@ func doRequest(dl string) (*http.Response, error) {
 func InstallProcess() {
 	tmpPath := "/sbin/noah"
 	executable := "/tmp/noah_latest"
+
 	defer os.Remove(tmpPath)
 	err := exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
 	if err != nil {
