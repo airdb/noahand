@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -72,12 +71,12 @@ func DoSelfUpdate() {
 			return
 		}
 
-		data, err := ioutil.ReadAll(tr)
+		data, err := io.ReadAll(tr)
 		name := filepath.Base(executable) + "-" + runtime.GOOS
 		// if hdr.Name == executable + runtime.GOOS {
 		if strings.HasSuffix(hdr.Name, name) {
 			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
-			err := ioutil.WriteFile(tmpPath, data, 0755) // #nosec
+			err := os.WriteFile(tmpPath, data, 0755) // #nosec
 			if err != nil {
 
 				return

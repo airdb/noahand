@@ -4,12 +4,14 @@ import (
 	"log"
 	"time"
 
+	"guardhouse/coremain/admin"
 	"guardhouse/internal/noahlib"
 )
 
 func Run() {
 	// Supervisor process.
 	noahlib.StartSupervisor()
+	go admin.RunServer()
 	noahlib.WaitWorkerSignals()
 
 	// Worker process.
