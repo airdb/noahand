@@ -33,6 +33,7 @@ func RunServer() {
 	addr := DefaultAdminListen
 
 	log.Printf("Starting admin server on %s", addr)
+
 	if err := http.ListenAndServe(addr, router); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

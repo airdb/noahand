@@ -60,18 +60,19 @@ func ToString() string {
 	return string(out)
 }
 
-const nullVersion  = "0.0.0"
+const nullVersion = "0.0.0"
+
 func getDeployVersion(executable string) string {
-	var sb strings.Builder
+	var stringBuilder strings.Builder
 	cmd := exec.CommandContext(context.Background(), executable, "-version")
-	cmd.Stdout = &sb
-	cmd.Stderr = &sb
+	cmd.Stdout = &stringBuilder
+	cmd.Stderr = &stringBuilder
 	err := cmd.Run()
 	if err != nil {
 		return nullVersion
 	}
 
-	return sb.String()
+	return stringBuilder.String()
 }
 
 func GetDeployVersion() string {

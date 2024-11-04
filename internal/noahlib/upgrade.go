@@ -18,12 +18,12 @@ import (
 )
 
 func DoSelfUpdate() {
-	dl := DefaultDomain + "/release/noah_latest.zip"
+	downloadURL := DefaultDomain + "/release/noah_latest.zip"
 
-	log.Printf("download url: %s\n", dl)
+	log.Printf("download url: %s\n", downloadURL)
 
 	start := time.Now()
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, dl, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, downloadURL, nil)
 	if err != nil {
 		log.Println(err)
 
@@ -34,7 +34,7 @@ func DoSelfUpdate() {
 	var body io.ReadCloser
 	resp, err := transport.RoundTrip(req)
 	if err != nil {
-		log.Println("download zip file fail, url:", dl)
+		log.Println("download zip file fail, url:", downloadURL)
 
 		return
 	}
@@ -56,22 +56,22 @@ func DoSelfUpdate() {
 	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
 
 	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
-	gr, err := gzip.NewReader(body)
+	gzipReader, err := gzip.NewReader(body)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	tr := tar.NewReader(gr)
+	tarReader := tar.NewReader(gzipReader)
 	for {
-		hdr, err := tr.Next()
+		hdr, err := tarReader.Next()
 		if err != nil {
 			log.Println("download_zip_fail")
 
 			return
 		}
 
-		data, err := io.ReadAll(tr)
+		data, err := io.ReadAll(tarReader)
 		name := filepath.Base(executable) + "-" + runtime.GOOS
 		// if hdr.Name == executable + runtime.GOOS {
 		if strings.HasSuffix(hdr.Name, name) {
