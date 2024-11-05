@@ -15,7 +15,8 @@ const nullVersion = "0.0.0"
 // Build version info.
 type BuildInfo struct {
 	GoVersion string    `json:"go_version"`
-	Env       string    `json:"env"`
+	Env       string    `json:"env,omitempty"`
+	Arch      string    `json:"arch"`
 	Repo      string    `json:"repo"`
 	Version   string    `json:"version"`
 	Build     string    `json:"build"`
@@ -35,6 +36,7 @@ func GetBuildInfo() *BuildInfo {
 	return &BuildInfo{
 		GoVersion: runtime.Version(),
 		Env:       os.Getenv("ENV"),
+		Arch:      runtime.GOOS + "/" + runtime.GOARCH,
 		Repo:      Repo,
 		Version:   Version,
 		Build:     Build,
