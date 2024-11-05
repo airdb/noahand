@@ -1,7 +1,7 @@
 package configkit
 
 import (
-	"guardhouse/internal/version"
+	"guardhouse/pkg/version"
 	"net"
 	"net/url"
 	"path"

@@ -3,8 +3,8 @@ package admin
 import (
 	"encoding/json"
 	"guardhouse/internal/noahlib"
-	"guardhouse/internal/version"
 	"guardhouse/pkg/configkit"
+	"guardhouse/pkg/version"
 	"net/http"
 
 	"github.com/go-chi/render"

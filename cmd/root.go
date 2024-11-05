@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"guardhouse/internal/noahlib"
-	"guardhouse/internal/version"
+	"guardhouse/pkg/version"
 	"os"
 
 	"github.com/spf13/cobra"

@@ -7,6 +7,18 @@ vars:
     - "darwin/amd64"
     - "darwin/arm64"
   outputDir: "./output"
+  SERVICE: "noah"
+  BUILD_TIME:
+    sh: date "+%Y-%m-%d_%H:%M:%S"
+  GIT_COMMIT:
+    sh: git rev-parse --short HEAD
+  VERSION:
+    sh: git describe --tags --always || echo "dev"
+  LDFLAGS: >
+    -X guardhouse/pkg/version.BuildTime={{.BUILD_TIME}}
+    -X guardhouse/pkg/version.Repo={{.SERVICE}}
+    -X guardhouse/pkg/version.Version={{.VERSION}}
+    -X guardhouse/pkg/version.Build={{.GIT_COMMIT}}
 
 tasks:
   default:
@@ -34,7 +46,7 @@ tasks:
   build:
     desc: Build guardhouse binary
     cmds:
-      - go build -o output/noah main.go
+      - go build -ldflags "{{.LDFLAGS}}" -o output/noah main.go
 
   docker-build:
     desc: Build guardhouse binary by docker
@@ -55,7 +67,7 @@ tasks:
           os=$(echo "$platform" | cut -d'/' -f1)
           arch=$(echo "$platform" | cut -d'/' -f2)
           echo "Building for OS: $os, Arch: $arch"
-          GOOS=$os GOARCH=$arch go build -o {{.outputDir}}/${os}_${arch}/noah main.go
+          GOOS=$os GOARCH=$arch go build -ldflags "{{.LDFLAGS}}" -o {{.outputDir}}/${os}_${arch}/noah main.go
 
           CGO_ENABLED=1 GOOS=$os GOARCH=$arch go build -buildmode=plugin -o {{.outputDir}}/${os}_${arch}/plugins/01_plugin.so plugins/01_plugin.go
           CGO_ENABLED=1 GOOS=$os GOARCH=$arch go build -buildmode=plugin -o {{.outputDir}}/${os}_${arch}/plugins/02_plugin.so plugins/02_plugin.go
