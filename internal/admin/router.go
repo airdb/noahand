@@ -31,6 +31,7 @@ func RunServer() {
 	// Register metrics handler
 	router.Handle("/internal/noah/metrics", promhttp.Handler())
 
+	router.Get("/internal/noah/config", RuntimeConfigHandler)
 	router.Get("/internal/noah/host", RuntimeHandler)
 	router.Get("/internal/noah/selfupdate", SelfUpdate)
 	router.Get("/internal/noah/selfupgrade", SelfUpdate)

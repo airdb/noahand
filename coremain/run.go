@@ -3,11 +3,14 @@ package coremain
 import (
 	"guardhouse/internal/admin"
 	"guardhouse/internal/noahlib"
+	"guardhouse/pkg/configkit"
 	"log"
 	"time"
 )
 
 func Run() {
+	configkit.InitConfig()
+
 	// Supervisor process.
 	noahlib.StartSupervisor()
 

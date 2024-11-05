@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"guardhouse/internal/noahlib"
 	"guardhouse/internal/version"
+	"guardhouse/pkg/configkit"
 	"net/http"
+
+	"github.com/go-chi/render"
 )
 
 func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
@@ -17,18 +20,22 @@ func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
 
 func APIListHandler(w http.ResponseWriter, _ *http.Request) {
 	msg := "api list:\n"
-	msg += "/internal/noah/host\n"
-	msg += "/internal/noah/selfupdate\n"
-	msg += "/internal/noah/selfupgrade\n"
-	msg += "/internal/noah/download_plugin\n"
-	msg += "/internal/noah/cmd\n"
-	msg += "/internal/noah/exec\n"
+
+	for _, api := range configkit.GetConfig().AdminApiList {
+		msg += api + "\n"
+	}
 
 	_, err := w.Write([]byte(msg))
 	if err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
 	}
+}
+
+func RuntimeConfigHandler(w http.ResponseWriter, r *http.Request) {
+	config := configkit.GetConfig()
+
+	render.JSON(w, r, config)
 }
 
 func RuntimeHandler(w http.ResponseWriter, _ *http.Request) {

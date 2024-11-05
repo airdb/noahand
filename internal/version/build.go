@@ -14,13 +14,13 @@ const nullVersion = "0.0.0"
 
 // Build version info.
 type BuildInfo struct {
-	GoVersion string
-	Env       string
-	Repo      string
-	Version   string
-	Build     string
-	BuildTime string
-	CreatedAt time.Time
+	GoVersion string    `json:"go_version"`
+	Env       string    `json:"env"`
+	Repo      string    `json:"repo"`
+	Version   string    `json:"version"`
+	Build     string    `json:"build"`
+	BuildTime string    `json:"build_time"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 var (

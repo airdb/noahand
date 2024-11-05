@@ -9,9 +9,10 @@ import (
 var CfgFile string
 
 type Config struct {
-	Addr        string `mapstructure:"addr" default:":8080"`
-	RedisURL    string `mapstructure:"redis_url"`
-	DatabaseURL string `mapstructure:"database_url"`
+	RunMode      string   `mapstructure:"run_mode" json:"run_mode" default:"local"`
+	Runtime      string   `mapstructure:"runtime" json:"runtime" default:"runtime"`
+	BuildInfo    any      `mapstructure:"build_info" json:"build_info"`
+	AdminApiList []string `mapstructure:"admin_api_list" json:"admin_api_list"`
 }
 
 var GlobalConfig Config
@@ -36,9 +37,9 @@ func Init() {
 	}
 
 	log.Println("Using config file:", viper.ConfigFileUsed())
-	log.Println("Read config from file: ", GlobalConfig.DatabaseURL)
+	log.Println("Read config from file: ", GlobalConfig.RunMode)
 }
 
-func GetConfig() Config {
-	return GlobalConfig
+func GetConfig() *Config {
+	return &GlobalConfig
 }

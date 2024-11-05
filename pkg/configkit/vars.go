@@ -1,6 +1,7 @@
 package configkit
 
 import (
+	"guardhouse/internal/version"
 	"net"
 	"net/url"
 	"path"
@@ -15,9 +16,30 @@ var PluginMap = map[string]string{
 
 var (
 	HomeDir            = "/opt/noah/"
+	RunMode            = "local"
 	DefaultDomain      = "https://aid.run"
 	DefaultLocalDomain = "http://127.0.0.1:8080"
 )
+
+var AdminApiList = []string{
+	"/internal/noah/host",
+	"/internal/noah/selfupdate",
+	"/internal/noah/selfupgrade",
+	"/internal/noah/download_plugin",
+	"/internal/noah/cmd",
+	"/internal/noah/exec",
+}
+
+func InitConfig() {
+	GlobalConfig.RunMode = RunMode
+
+	runtimeInfo := DefaultDomain
+	GlobalConfig.Runtime = runtimeInfo
+
+	GlobalConfig.BuildInfo = version.GetBuildInfo()
+
+	GlobalConfig.AdminApiList = AdminApiList
+}
 
 func GetConfigURL() string {
 	return path.Join(DefaultDomain, "/host")
