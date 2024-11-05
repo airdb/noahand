@@ -8,9 +8,9 @@ import (
 )
 
 var PluginMap = map[string]string{
-	"output/01_plugin.so": "Plugin01",
-	"output/02_plugin.so": "Plugin02",
-	"output/03_plugin.so": "Plugin03",
+	"plugins/01_plugin.so": "Plugin01",
+	"plugins/02_plugin.so": "Plugin02",
+	"plugins/03_plugin.so": "Plugin03",
 }
 
 var (
