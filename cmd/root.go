@@ -29,16 +29,20 @@ import (
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "noah",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Noah Server Management System",
+	Long: `Noah is a server management system that helps you manage your servers efficiently.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+Get Started:
+- Step 1: run "noah init" to generate a systemd service file.
+- Step 2: run "sudo systemctl daemon-reload" to reload the systemd service.
+- Step 3: run "udo systemctl start noah" to start the noah service.
+- Step 4: run "sudo systemctl enable noah" to enable the noah service on boot.
+- Step 5: run "sudo journalctl -u noah -f" to view the noah service logs.
+
+For more information, please visit https://aid.run`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
 }
 
 // updateCmd represents the update command.
