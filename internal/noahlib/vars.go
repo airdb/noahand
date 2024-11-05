@@ -1,10 +1,15 @@
 package noahlib
 
 import (
+	"fmt"
+	"log"
 	"net"
 	"net/url"
+	"os"
+	"os/exec"
 	"path"
 	"runtime"
+	"strings"
 )
 
 var (
@@ -70,7 +75,14 @@ func GetLocalIP() string {
 }
 
 func GetHostname() string {
-	return "hostname"
+	hostname, err := os.Hostname()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "unknown"
+	}
+	fmt.Println("Hostname:", hostname)
+
+	return hostname
 }
 
 func GetArch() string {
@@ -86,9 +98,35 @@ func GetKernel() string {
 }
 
 func GetSystemInfo() string {
-	return "system info"
+	var info string
+
+	switch runtime.GOOS {
+	case "linux":
+		cmd := exec.Command("uname", "-a")
+		output, err := cmd.Output()
+		if err != nil {
+			log.Println("Error:", err)
+			info = "unknown"
+		} else {
+			info = string(output)
+		}
+	case "darwin":
+		cmd := exec.Command("sw_vers")
+		output, err := cmd.Output()
+		if err != nil {
+			log.Println("Error:", err)
+			info = "unknown"
+		} else {
+			info = string(output)
+		}
+	default:
+		log.Println("unsupported os: " + runtime.GOOS)
+		info = "unknown os: " + runtime.GOOS
+	}
+
+	return info
 }
 
 func GetEnvironment() string {
-	return "env"
+	return strings.Join(os.Environ(), "\n")
 }
