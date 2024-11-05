@@ -1,6 +1,7 @@
 package noahlib
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -90,7 +91,47 @@ func GetArch() string {
 }
 
 func GetOS() string {
-	return runtime.GOOS
+	var info string
+
+	switch runtime.GOOS {
+	case "linux":
+		cmd := exec.Command("bash", "-c", "grep '^PRETTY_NAME=' /etc/os-release | cut -d '\"' -f 2")
+		output, err := cmd.Output()
+		if err != nil {
+			log.Println("Error:", err)
+			info = "unknown"
+		} else {
+			info = strings.TrimSpace(string(output))
+		}
+	case "darwin":
+		cmd := exec.Command("sw_vers")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		err := cmd.Run()
+		if err != nil {
+			log.Println("Error:", err)
+			info = "unknown"
+		} else {
+			lines := strings.Split(out.String(), "\n")
+			var productName, productVersion, buildVersion string
+			for _, line := range lines {
+				if strings.HasPrefix(line, "ProductName:") {
+					productName = strings.TrimSpace(strings.Split(line, ":")[1])
+				} else if strings.HasPrefix(line, "ProductVersion:") {
+					productVersion = strings.TrimSpace(strings.Split(line, ":")[1])
+				} else if strings.HasPrefix(line, "BuildVersion:") {
+					buildVersion = strings.TrimSpace(strings.Split(line, ":")[1])
+				}
+			}
+
+			info = productName + " " + productVersion + " " + buildVersion
+		}
+
+	default:
+		info = "unknown os: " + runtime.GOOS
+	}
+
+	return info
 }
 
 func GetKernel() string {
