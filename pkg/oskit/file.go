@@ -121,7 +121,6 @@ func Untar(src string, dest string) error {
 		}
 	}
 
-	log.Println("Untar done")
 	return nil
 }
 

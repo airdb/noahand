@@ -34,6 +34,7 @@ func Plugin04() {
 
 	os.MkdirAll(unzipPath, 0o755)
 
+	defer os.Remove(dpath)
 	oskit.ExtractTarball(dpath, unzipPath)
 	log.Println("Unzipped to", unzipPath)
 }
