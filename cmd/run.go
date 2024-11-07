@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"guardhouse/coremain"
+	"guardhouse/internal/coremain"
 
 	"github.com/spf13/cobra"
 )

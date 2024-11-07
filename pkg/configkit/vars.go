@@ -1,21 +1,23 @@
 package configkit
 
 import (
+	"guardhouse/pkg/oskit"
 	"guardhouse/pkg/version"
 	"net"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"runtime"
-)
+	"strings"
 
-var PluginMap = map[string]string{
-	"plugins/01_plugin.so": "Plugin01",
-	"plugins/02_plugin.so": "Plugin02",
-	"plugins/03_plugin.so": "Plugin03",
-}
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
 
 var (
 	HomeDir            = "/opt/noah/"
+	PluginDir          = "./plugins"
 	RunMode            = "local"
 	DefaultDomain      = "https://aid.run"
 	DefaultLocalDomain = "http://127.0.0.1:8080"
@@ -30,7 +32,16 @@ var AdminApiList = []string{
 	"/internal/noah/exec",
 }
 
+var PluginMap = make(map[string]string)
+
 func InitConfig() {
+	if oskit.IsRunGoBuild() {
+		HomeDir = "./"
+		RunMode = "local"
+		DefaultDomain = DefaultLocalDomain
+		PluginDir = "./output/plugins"
+	}
+
 	GlobalConfig.RunMode = RunMode
 
 	runtimeInfo := DefaultDomain
@@ -39,6 +50,35 @@ func InitConfig() {
 	GlobalConfig.BuildInfo = version.GetBuildInfo()
 
 	GlobalConfig.AdminApiList = AdminApiList
+
+	PluginMap = CheckPlugins(PluginDir)
+}
+
+// Check how many plugins in plugins directory.
+func CheckPlugins(pluginDir string) map[string]string {
+	err := filepath.Walk(pluginDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".so") {
+			pluginName := strings.TrimSuffix(info.Name(), ".so")
+			tmps := strings.Split(pluginName, "_")
+			pluginName = tmps[1] + tmps[0]
+
+			titleCaser := cases.Title(language.Und)
+			PluginMap[path] = titleCaser.String(pluginName)
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	for k, v := range PluginMap {
+		println(k, v)
+	}
+
+	return PluginMap
 }
 
 func GetConfigURL() string {

@@ -37,6 +37,7 @@ tasks:
       - CGO_ENABLED=1 go build -buildmode=plugin -o output/plugins/01_plugin.so plugins/01_plugin.go
       - CGO_ENABLED=1 go build -buildmode=plugin -o output/plugins/02_plugin.so plugins/02_plugin.go
       - CGO_ENABLED=1 go build -buildmode=plugin -o output/plugins/03_plugin.so plugins/03_plugin.go
+      - CGO_ENABLED=1 go build -buildmode=plugin -o output/plugins/04_plugin.so plugins/04_plugin.go
 
   run:
     desc: Run guardhouse locally

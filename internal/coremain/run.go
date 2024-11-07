@@ -19,8 +19,8 @@ func Run() {
 	// Worker process.
 	go func() {
 		for {
+			log.Println("plugin management")
 			RunPlugin()
-			log.Println("plugin run")
 			// noahlib.DoSelfUpdate()
 			// log.Println("self update")
 			time.Sleep(time.Minute)

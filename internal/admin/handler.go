@@ -2,7 +2,6 @@ package admin
 
 import (
 	"encoding/json"
-	"guardhouse/internal/noahlib"
 	"guardhouse/pkg/configkit"
 	"guardhouse/pkg/version"
 	"net/http"
@@ -50,7 +49,6 @@ func RuntimeHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func SelfUpdate(w http.ResponseWriter, _ *http.Request) {
-	noahlib.DoSelfUpdate()
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("upgrade successfully"))
 	if err != nil {
@@ -60,7 +58,6 @@ func SelfUpdate(w http.ResponseWriter, _ *http.Request) {
 }
 
 func DownloadPlugin(w http.ResponseWriter, _ *http.Request) {
-	noahlib.Downloader()
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("upgrade plugin successfully"))
 	if err != nil {

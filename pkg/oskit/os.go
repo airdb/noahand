@@ -1,12 +1,30 @@
-package noahlib
+package oskit
 
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 )
+
+// There is 2 ways to run a go program:
+// 1. go run main.go
+// 2. go build -o main main.go && ./main
+// This function is used to check which way the program is running
+// Because the diffent way will use different config path.
+func IsRunGoBuild() bool {
+	path := os.Args[0]
+
+	if strings.Contains(path, "go-build") {
+		log.Println("Program is running with go run")
+	} else {
+		log.Println("Program was built with go build")
+	}
+
+	return strings.Contains(path, "go-build")
+}
 
 func runInWindows(cmd string) (string, error) {
 	result, err := exec.Command("cmd", "/c", cmd).Output()
