@@ -80,7 +80,36 @@ func DoSelfUpdate() {
 }
 */
 
-func ResumableDownload(url, dest string) error {
+func IsEmptyRemoteFile(surl string) (flag bool) {
+	// Use HEAD request to check file size and ensure content is available
+	headReq, err := http.NewRequestWithContext(context.Background(), http.MethodHead, surl, nil)
+	if err != nil {
+		return
+	}
+
+	client := &http.Client{}
+	headResp, err := client.Do(headReq)
+	if err != nil {
+		return
+	}
+	defer headResp.Body.Close()
+
+	// Check Content-Length to ensure file is not empty
+	if headResp.ContentLength <= 0 {
+		log.Println("file is empty or server does not provide content length")
+		return
+	}
+
+	flag = true
+	return
+}
+
+func ResumableDownload(surl, dest string) error {
+	if IsEmptyRemoteFile(surl) {
+		log.Println("file is empty or server does not provide content length")
+		return nil
+	}
+
 	tmpFile, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE, 0o755)
 	if err != nil {
 		return err
@@ -92,7 +121,7 @@ func ResumableDownload(url, dest string) error {
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, surl, nil)
 	if err != nil {
 		return err
 	}
@@ -123,19 +152,4 @@ func ResumableDownload(url, dest string) error {
 	}
 
 	return nil
-}
-
-func DownloadFile() {
-	log.SetFlags(log.Lshortfile)
-	log.Println("Hello from Plugin 04!")
-
-	// Download a file
-	surl := "http://oracle.airdb.host:8000/noah_latest.tgz"
-	dpath := "/tmp/noah_latest.tgz"
-
-	err := ResumableDownload(surl, dpath)
-	if err != nil {
-		log.Println("Download failed")
-		return
-	}
 }
