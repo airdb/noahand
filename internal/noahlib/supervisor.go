@@ -29,10 +29,12 @@ func StartSupervisor() {
 	osEnviron := strings.Split(strings.Join(os.Environ(), "\x00")+"\x00master=0", "\x00")
 
 	if os.Getenv("master") != "0" {
-		setProcessName(filepath.Base(executable) + ":master process " + executable)
+		// setProcessName(filepath.Base(executable) + ":master process " + executable)
+		setProcessName(filepath.Base(executable) + ":master process")
 	} else {
-		setProcessName(filepath.Base(executable) + ":worker process " + executable)
-
+		// setProcessName(filepath.Base(executable) + ":worker process " + executable)
+		setProcessName(filepath.Base(executable) + ":worker process")
+		log.Println("Worker process started")
 		return
 	}
 
@@ -41,14 +43,14 @@ func StartSupervisor() {
 	var supervisor func()
 
 	supervisor = func() {
+		log.Println("Starting worker process")
 		p, err := os.StartProcess(executable, osArgs, &os.ProcAttr{
 			Dir:   ".",
 			Env:   osEnviron,
 			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 		})
 		if err != nil {
-			log.Println(executable)
-
+			log.Println("Error starting process:", err)
 			return
 		}
 
@@ -60,10 +62,11 @@ func StartSupervisor() {
 
 		ps, err := p.Wait()
 		if err != nil {
-			log.Println(err.Error())
+			log.Println("Process wait error:", err)
 		}
 
 		if ps != nil && !ps.Success() {
+			log.Println("Worker process exited with failure, restarting")
 			go supervisor()
 		}
 	}
@@ -79,14 +82,13 @@ func StartSupervisor() {
 	for {
 		switch sig := <-signalChan; sig {
 		case syscall.SIGTERM, syscall.SIGINT:
+			log.Println("Received signal:", sig)
 			for _, child := range childs {
 				_ = child.Signal(sig)
 			}
-
 			os.Exit(0)
 		case syscall.SIGHUP:
-			log.Println("master start worker")
-
+			log.Println("Received SIGHUP, starting worker")
 			go supervisor()
 		}
 	}
