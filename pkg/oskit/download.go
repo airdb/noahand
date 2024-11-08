@@ -10,74 +10,10 @@ import (
 )
 
 /*
-func DoSelfUpdate() {
-	downloadURL := DefaultDomain + "/release/noah_latest.zip"
-
-	log.Printf("download url: %s\n", downloadURL)
-
-	start := time.Now()
-	tmpPath := fmt.Sprintf("/tmp/%s.%d", filepath.Base(executable), time.Now().UnixNano())
-
-	err := ResumableDownload(downloadURL, tmpPath)
-	if err != nil {
-		log.Println("download zip file fail, url:", downloadURL)
-		return
-	}
-
-	log.Printf("%s download successfully, cost: %s\n", executable, time.Since(start))
-
-	executable, err := os.Executable()
-	if err != nil {
-		log.Println("get_executable_fail")
-
-		return
-	}
-
-	gzipReader, err := gzip.NewReader(body)
-	if err != nil {
-		log.Println(err)
-
-		return
-	}
-
-	tarReader := tar.NewReader(gzipReader)
-
-	for {
-		hdr, err := tarReader.Next()
-		if err != nil {
-			log.Println("download_zip_fail")
-
-			return
-		}
-
-		data, err := io.ReadAll(tarReader)
-		name := filepath.Base(executable) + "-" + runtime.GOOS
-		// if hdr.Name == executable + runtime.GOOS {
-		if strings.HasSuffix(hdr.Name, name) {
-			log.Printf("start write file, name: %v, size: %v, tmpPath: %v\n", hdr.Name, hdr.Size, tmpPath)
-			err := os.WriteFile(tmpPath, data, 0o755) // #nosec
-			if err != nil {
-				return
-			}
-			// file written, quit listing loop.
-			break
-		}
-
-		if err != nil {
-			return
-		}
-	}
-
-	defer os.Remove(tmpPath)
-	err = exec.CommandContext(context.Background(), "/usr/bin/install", tmpPath, executable).Run()
-	if err != nil {
-		log.Println(err)
-	}
-
-	log.Printf("%s install successfully, cost: %s\n", executable, time.Since(start))
-	// SendReloadSignal()
-	log.Printf("%s reload successfully, cost: %s\n", executable, time.Since(start))
-}
+Rules:
+- 1. Download file must be tarball, and file extension must be .tgz or .tar.gz, zip or tar.
+- 2. Download file must be a valid file, not empty.
+- 3. Download file must have a md5 download file. (example, tarbal is xxx.tgz, md5 file name is xxx.tgz.md5, and must keep at the same directory)
 */
 
 func IsEmptyRemoteFile(surl string) (flag bool) {
@@ -111,11 +47,6 @@ func IsEmptyRemoteFile(surl string) (flag bool) {
 }
 
 func ResumableDownload(surl, dest string) error {
-	if IsEmptyRemoteFile(surl) {
-		log.Println("file is empty or server does not provide content length")
-		return nil
-	}
-
 	tmpFile, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE, 0o755)
 	if err != nil {
 		return err
@@ -158,4 +89,31 @@ func ResumableDownload(surl, dest string) error {
 	}
 
 	return nil
+}
+
+// Download https://xxx/noah_latest.tgz.md5 file， read md5 value from body.
+func DownloadMd5File(surl string) (string, error) {
+	resp, err := http.Get(surl)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	md5, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(md5), nil
+}
+
+// Get download filesize by http content-length.
+func GetDownloadFileSize(surl string) (int64, error) {
+	resp, err := http.Head(surl)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	return resp.ContentLength, nil
 }
