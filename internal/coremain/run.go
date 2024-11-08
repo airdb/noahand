@@ -24,6 +24,9 @@ func Run() {
 		timestamp := time.Now().Format("2006-01-02 15:04:05")
 		log.SetPrefix(fmt.Sprintf("%s PID-%d ", timestamp, os.Getpid()))
 
+		executable, _ := os.Executable()
+		noahlib.MonitorMasterProcess(executable)
+
 		for {
 			log.Println("plugin management")
 			RunPlugin()

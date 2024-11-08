@@ -38,7 +38,7 @@ func StartSupervisor() {
 		// setProcessName(filepath.Base(executable) + ":worker process " + executable)
 		setProcessName(filepath.Base(executable) + ":worker process")
 		log.Println("Worker process started")
-		go monitorMasterProcess(executable)
+		// go monitorMasterProcess(executable)
 		return
 	}
 
@@ -98,7 +98,7 @@ func StartSupervisor() {
 	}
 }
 
-func monitorMasterProcess(executable string) {
+func MonitorMasterProcess(executable string) {
 	for {
 		if !isMasterRunning() {
 			log.Println("Master process not running, restarting")
