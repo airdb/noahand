@@ -29,6 +29,8 @@ var (
 
 	SystemdFilepath = "/etc/systemd/system/noah.service"
 	SystemdFilename = "noah.service"
+
+	TmpDir = "/tmp/noah/"
 )
 
 var AdminApiList = []string{

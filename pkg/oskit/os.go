@@ -71,26 +71,23 @@ func GetPid(serverName string) (string, error) {
 }
 
 func DownloadAndInstallTarball() error {
-	// 1. Download the tarball
-	// 2. Calculate the MD5 checksum of the tarball
-	// 3. Extract the tarball
-	// 4. Install the modules by directly copying the files
-
 	// Download a file
 	surl := "http://oracle.airdb.host:8000/noah_latest.tgz"
 	dpath := "/tmp/noah_latest.tgz"
 
 	// 1. Get the md5 value from the md5 file.
-	md5, err := DownloadMd5File(surl + ".md5")
+	remoteMd5, err := DownloadMd5File(surl + ".md5")
 	if err != nil {
 		log.Println("Failed to download md5 file", err)
 
 		return err
 	}
 
+	log.Println("Downloaded md5 file, md5:", remoteMd5)
+
 	// 2. check if the `modules/{md5}` directory exists.
-	if IsDirNotEmpty(configkit.ModulesDir + "/" + md5) {
-		log.Println("modules already installed, skip installation, module md5:", md5)
+	if IsDirNotEmpty(configkit.ModulesDir + "/" + remoteMd5) {
+		log.Println("modules already installed, skip installation, module md5:", remoteMd5)
 		return nil
 	}
 
@@ -123,27 +120,28 @@ func DownloadAndInstallTarball() error {
 	}
 
 	// 6. Compare the md5 value from the md5 file and the local file.
-	if md5File != md5 {
-		log.Println("MD5 value does not match")
+	if md5File != remoteMd5 {
+		log.Println("xxx")
+		log.Printf("MD5 value does not match, local md5: %s, remote md5: %s", md5File, remoteMd5)
 		return fmt.Errorf("md5 value does not match")
 	}
 	log.Println("Download successfully")
 
 	// 7. Extract the tarball.
-	unzipPath := path.Join("/tmp/noah", md5)
+	unzipPath := path.Join("/tmp/noah", remoteMd5)
 
 	ExtractTarball(dpath, unzipPath)
-	log.Println("Unzipped to", configkit.ModulesDir+"/"+md5)
+	log.Println("Unzipped to", configkit.ModulesDir+"/"+remoteMd5)
 
 	defer os.Remove(dpath)
 	ExtractTarball(dpath, unzipPath)
 	log.Println("Unzipped to", unzipPath)
 
 	// 8. Install the modules by directly copying the files.
-	modulesPath := path.Join(configkit.ModulesDir, md5)
+	modulesPath := path.Join(configkit.ModulesDir, remoteMd5)
 
 	if IsDirNotEmpty(modulesPath) {
-		log.Println("Module already exists, skip installation, module md5:", md5)
+		log.Println("Module already exists, skip installation, module md5:", remoteMd5)
 		// InstallTypeSkip
 
 		return nil

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 /*
@@ -99,12 +100,15 @@ func DownloadMd5File(surl string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	md5, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 
-	return string(md5), nil
+	// The md5 file content is format is `{md5} {filename}`.
+	md5 := strings.Split(string(body), " ")[0]
+
+	return md5, nil
 }
 
 // Get download filesize by http content-length.
