@@ -32,7 +32,7 @@ func Run() {
 
 		executable, _ := os.Executable()
 		log.Println("noah worker, executable, ", executable)
-		noahlib.MonitorMasterProcess(executable)
+		// noahlib.MonitorMasterProcess(executable)
 
 		for {
 			log.Println("plugin management")

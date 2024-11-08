@@ -15,16 +15,14 @@ func RunPlugin() {
 func RunPluginWithParams(pluginPath string, pluginName string) {
 	plugin, err := plugin.Open(pluginPath)
 	if err != nil {
-		log.Println("Error loading plugin:", err)
-
+		log.Printf("Error loading plugin from path %s: %v", pluginPath, err)
 		return
 	}
 
 	// 查找插件中的 Hello 函数
 	helloSymbol, err := plugin.Lookup(pluginName)
 	if err != nil {
-		log.Println("Error finding Hello function:", err)
-
+		log.Printf("Error finding function %s in plugin %s: %v", pluginName, pluginPath, err)
 		return
 	}
 
@@ -34,7 +32,6 @@ func RunPluginWithParams(pluginPath string, pluginName string) {
 	helloFunc, ok := helloSymbol.(func())
 	if !ok {
 		log.Println("Error asserting Hello function type", ok)
-
 		return
 	}
 
