@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -35,6 +36,7 @@ func StartSupervisor() {
 		// setProcessName(filepath.Base(executable) + ":worker process " + executable)
 		setProcessName(filepath.Base(executable) + ":worker process")
 		log.Println("Worker process started")
+		go monitorMasterProcess(executable)
 		return
 	}
 
@@ -92,6 +94,40 @@ func StartSupervisor() {
 			go supervisor()
 		}
 	}
+}
+
+func monitorMasterProcess(executable string) {
+	for {
+		if !isMasterRunning() {
+			log.Println("Master process not running, restarting")
+			err := startMasterProcess(executable)
+			if err != nil {
+				log.Println("Error restarting master process:", err)
+			}
+		}
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func isMasterRunning() bool {
+	// Implement logic to check if master process is running
+	// This could be done by checking for a specific PID file or process name
+	return false
+}
+
+func startMasterProcess(executable string) error {
+	setProcessName(filepath.Base(executable) + ":master process")
+
+	p, err := os.StartProcess(executable, os.Args, &os.ProcAttr{
+		Dir:   ".",
+		Env:   os.Environ(),
+		Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
+	})
+	if err != nil {
+		return err
+	}
+	_, err = p.Wait()
+	return err
 }
 
 var (
