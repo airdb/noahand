@@ -18,7 +18,7 @@ func Plugin03() {
 		SysProcAttr: &syscall.SysProcAttr{},
 	}
 
-	cmd := exec.Command("/bin/bash", "-c", "echo $PATH && echo $HOME")
+	cmd := exec.Command("/bin/bash", "-c", "echo plugin03 && echo $HOME")
 	cmd.SysProcAttr = cgroupConfig.SysProcAttr
 	cmd.Env = os.Environ()
 
