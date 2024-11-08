@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"guardhouse/pkg/configkit"
 	"guardhouse/pkg/service"
 	"log"
 	"runtime"
@@ -33,7 +34,7 @@ func init() {
 }
 
 func InitSystemdService() {
-	serviceFilePath := "/etc/systemd/system/noah.service"
+	serviceFilePath := configkit.SystemdFilepath
 
 	if runtime.GOOS != "linux" {
 		log.Println("init systemd service is only supported on Linux.")
