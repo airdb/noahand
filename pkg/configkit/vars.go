@@ -121,7 +121,7 @@ func GetConfigURL() string {
 }
 
 func GetAdminHeathURL() string {
-	return path.Join(AdminAddr, "/internal/noah/heath")
+	return "http://" + AdminAddr + "/internal/noah/heath"
 }
 
 func GetHostHeartbeatURL() string {
