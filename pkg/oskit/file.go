@@ -58,7 +58,7 @@ func InstallDirectory(sourceDir, destDir string) {
 		log.Fatalf("Error processing files: %v", err)
 	}
 
-	fmt.Println("Files copied successfully.")
+	log.Println("install module successfully, dest:", destDir)
 }
 
 // Copy file with permissions (for executable files)
