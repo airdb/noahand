@@ -84,12 +84,16 @@ func IsEmptyRemoteFile(surl string) (flag bool) {
 	// Use HEAD request to check file size and ensure content is available
 	headReq, err := http.NewRequestWithContext(context.Background(), http.MethodHead, surl, nil)
 	if err != nil {
+		flag = true
+
 		return
 	}
 
 	client := &http.Client{}
 	headResp, err := client.Do(headReq)
 	if err != nil {
+		flag = true
+
 		return
 	}
 	defer headResp.Body.Close()
@@ -97,10 +101,12 @@ func IsEmptyRemoteFile(surl string) (flag bool) {
 	// Check Content-Length to ensure file is not empty
 	if headResp.ContentLength <= 0 {
 		log.Println("file is empty or server does not provide content length")
+		flag = true
+
 		return
 	}
 
-	flag = true
+	// Default flag is false, which means file is not empty.
 	return
 }
 

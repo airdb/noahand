@@ -2,29 +2,21 @@ package oskit
 
 import (
 	"fmt"
+	"guardhouse/pkg/configkit"
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 )
 
-// There is 2 ways to run a go program:
-// 1. go run main.go
-// 2. go build -o main main.go && ./main
-// This function is used to check which way the program is running
-// Because the diffent way will use different config path.
-func IsRunGoBuild() bool {
-	path := os.Args[0]
-
-	if strings.Contains(path, "go-build") {
-		log.Println("Program is running with go run")
-	} else {
-		log.Println("Program was built with go build")
-	}
-
-	return strings.Contains(path, "go-build")
-}
+const (
+	InstallTypeForce     = "force"
+	InstallTypeOverwrite = "overwrite"
+	InstallTypeSkip      = "skip"
+	InstallTypeUpdate    = "update"
+)
 
 func runInWindows(cmd string) (string, error) {
 	result, err := exec.Command("cmd", "/c", cmd).Output()
@@ -76,4 +68,44 @@ func GetPid(serverName string) (string, error) {
 	}
 
 	return pid, nil
+}
+
+func InstallTarball() {
+	// 1. Download the tarball
+	// 2. Calculate the MD5 checksum of the tarball
+	// 3. Extract the tarball
+	// 4. Install the modules by directly copying the files
+
+	// Download a file
+	surl := "http://oracle.airdb.host:8000/noah_latest.tgz"
+	dpath := "/tmp/noah_latest.tgz"
+
+	err := ResumableDownload(surl, dpath)
+	if err != nil {
+		log.Println("Download failed")
+		return
+	}
+
+	log.Println("Download successfully")
+
+	// get file md5
+	md5, err := GetFileMD5(dpath)
+	if err != nil {
+		log.Println("Failed to get file md5")
+		return
+	}
+	unzipPath := path.Join("/tmp/noah", md5)
+
+	err = os.MkdirAll(unzipPath, 0o755)
+	if err != nil {
+		log.Println("Failed to create directory", unzipPath)
+		return
+	}
+
+	defer os.Remove(dpath)
+	ExtractTarball(dpath, unzipPath)
+	log.Println("Unzipped to", unzipPath)
+
+	// The runtime process cannot install directly.
+	InstallDirectory(unzipPath, configkit.ModulesDir)
 }

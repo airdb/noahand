@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"log"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -28,7 +29,10 @@ func CreateTable() {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Heartbeat{})
+	err = db.AutoMigrate(&Heartbeat{})
+	if err != nil {
+		log.Fatalf("failed to migrate schema: %v", err)
+	}
 }
 
 /*

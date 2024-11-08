@@ -1,169 +1,110 @@
 package oskit
 
 import (
-	"archive/tar"
-	"archive/zip"
-	"compress/gzip"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-// Calculate the MD5 checksum of a file
-func GetFileMD5(filePath string) (string, error) {
-	// Open the file
-	file, err := os.Open(filePath)
+func InstallDirectory(sourceDir, destDir string) {
+	// Create destination base directory
+	err := os.MkdirAll(destDir, os.ModePerm)
 	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	// Create a new MD5 hash object
-	hash := md5.New()
-
-	// Copy the file content into the hash object
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
+		log.Fatalf("Failed to create destination directory: %v", err)
 	}
 
-	// Get the final hash as a byte slice and convert it to a hex string
-	hashInBytes := hash.Sum(nil)
-	hashInString := hex.EncodeToString(hashInBytes)
+	// Walk through the source directory
+	err = filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error accessing %s: %v", path, err)
+		}
 
-	return hashInString, nil
+		// Define the corresponding destination path
+		relPath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return fmt.Errorf("failed to calculate relative path: %v", err)
+		}
+		destPath := filepath.Join(destDir, relPath)
+
+		if info.IsDir() {
+			// Create the directory in the destination
+			err := os.MkdirAll(destPath, info.Mode())
+			if err != nil {
+				return fmt.Errorf("failed to create directory %s: %v", destPath, err)
+			}
+			return nil
+		}
+
+		// Handle file based on its permissions
+		if info.Mode()&0o111 != 0 {
+			// File has execute permission, copy with permissions
+			err := copyFileWithPermissions(path, destPath, info.Mode())
+			if err != nil {
+				return fmt.Errorf("error copying executable file %s: %v", path, err)
+			}
+		} else {
+			// File without execute permission, simple copy
+			err := copyFile(path, destPath)
+			if err != nil {
+				return fmt.Errorf("error copying non-executable file %s: %v", path, err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		log.Fatalf("Error processing files: %v", err)
+	}
+
+	fmt.Println("Files copied successfully.")
 }
 
-func ExtractTarball(srcFile string, destPath string) {
-	if strings.HasSuffix(srcFile, ".zip") {
-		unzip(srcFile, destPath)
-	} else if strings.HasSuffix(srcFile, ".tar.gz") {
-		Untar(srcFile, destPath)
-	} else if strings.HasSuffix(srcFile, ".tgz") {
-		Untar(srcFile, destPath)
-	} else if strings.HasSuffix(srcFile, ".tar") {
-		Untar(srcFile, destPath)
-	} else {
-		log.Println("Unknown file format")
+// Copy file with permissions (for executable files)
+func copyFileWithPermissions(src, dst string, perm os.FileMode) error {
+	// Ensure the destination directory exists
+	if err := os.MkdirAll(filepath.Dir(dst), os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create destination directory for %s: %v", dst, err)
 	}
-}
 
-// Extract a .tar or .tar.gz file
-func Untar(src string, dest string) error {
-	log.Println("Untar", src, "to", dest)
-
-	// Open the source file
-	file, err := os.Open(src)
-	if err != nil {
+	// Copy the file content
+	if err := copyFile(src, dst); err != nil {
 		return err
 	}
-	defer file.Close()
 
-	var fileReader io.Reader = file
-
-	// Check if it's a .tar.gz file, and create a gzip reader if so
-	if filepath.Ext(src) == ".gz" || filepath.Ext(src) == ".tgz" {
-		gzipReader, err := gzip.NewReader(file)
-		if err != nil {
-			return err
-		}
-		defer gzipReader.Close()
-		fileReader = gzipReader
+	// Set the permissions for executable files
+	if err := os.Chmod(dst, perm); err != nil {
+		return fmt.Errorf("failed to set permissions on %s: %v", dst, err)
 	}
-
-	// Create a tar reader
-	tarReader := tar.NewReader(fileReader)
-	log.Println("Start untar")
-
-	// Iterate through the tar archive
-	for {
-		header, err := tarReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-
-		// Define the target location
-		target := filepath.Join(dest, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			// Create directory if it doesn't exist
-			if err := os.MkdirAll(target, os.FileMode(header.Mode)); err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			// Ensure the directory exists before creating the file
-			if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
-				return err
-			}
-
-			// Create the file and defer its closure
-			outFile, err := os.Create(target)
-			if err != nil {
-				return err
-			}
-			defer outFile.Close()
-
-			// Copy the file content
-			if _, err := io.Copy(outFile, tarReader); err != nil {
-				return err
-			}
-
-		default:
-			// Handle other file types if necessary (e.g., symlinks)
-		}
-	}
-
 	return nil
 }
 
-func unzip(src string, dest string) error {
-	r, err := zip.OpenReader(src)
+// Simple file copy function
+func copyFile(src, dst string) error {
+	// Open source file
+	srcFile, err := os.Open(src)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open source file %s: %v", src, err)
 	}
-	defer r.Close()
+	defer srcFile.Close()
 
-	for _, f := range r.File {
-		fpath := filepath.Join(dest, f.Name)
-		if !strings.HasPrefix(fpath, filepath.Clean(dest)+string(os.PathSeparator)) {
-			return fmt.Errorf("illegal file path: %s", fpath)
-		}
-
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(fpath, os.ModePerm)
-			continue
-		}
-
-		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
-			return err
-		}
-
-		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			return err
-		}
-
-		rc, err := f.Open()
-		if err != nil {
-			outFile.Close()
-			return err
-		}
-
-		_, err = io.Copy(outFile, rc)
-		outFile.Close()
-		rc.Close()
-
-		if err != nil {
-			return err
-		}
+	// Ensure the destination directory exists
+	if err := os.MkdirAll(filepath.Dir(dst), os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create destination directory for %s: %v", dst, err)
 	}
+
+	// Create destination file
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("failed to create destination file %s: %v", dst, err)
+	}
+	defer dstFile.Close()
+
+	// Copy contents from source to destination
+	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		return fmt.Errorf("error copying contents to %s: %v", dst, err)
+	}
+
 	return nil
 }

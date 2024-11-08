@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"guardhouse/pkg/configkit"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -73,19 +74,19 @@ func GenerateServiceFile(serviceConfig ServiceConfig, outputPath string) error {
 	}
 
 	// 创建模板并解析内容
-	tmpl, err := template.New("noah.service").Parse(SystemdServiceTemplate)
+	tmpl, err := template.New(configkit.SystemdFilename).Parse(SystemdServiceTemplate)
 	if err != nil {
 		return fmt.Errorf("error parsing template: %v", err)
 	}
 
 	// 确保目录存在
 	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("error creating directory: %v", err)
 	}
 
 	// 创建服务文件
-	file, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		return fmt.Errorf("error creating service file: %v", err)
 	}

@@ -1,6 +1,7 @@
 package noahlib
 
 import (
+	"guardhouse/pkg/configkit"
 	"log"
 	"math/rand"
 	"net/http"
@@ -23,13 +24,8 @@ type HostHeartbeatResp struct{}
 
 func RandomHeartbeat() {
 	for {
-		// rand.Seed(900)
-		maxSleepInterval := 60
-		maxSleepInterval = 900
+		t := rand.Intn(configkit.MaxSleepInterval)
 
-		t := rand.Intn(maxSleepInterval)
-
-		// t = 10
 		log.Println("sleep time seed", t)
 
 		time.Sleep(time.Duration(t) * time.Second)
