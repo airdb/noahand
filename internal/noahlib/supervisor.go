@@ -102,10 +102,12 @@ func MonitorMasterProcess(executable string) {
 	for {
 		if !isMasterRunning() {
 			log.Println("Master process not running, restarting")
-			err := startMasterProcess(executable)
-			if err != nil {
-				log.Println("Error restarting master process:", err)
-			}
+			/*
+				err := startMasterProcess(executable)
+				if err != nil {
+					log.Println("Error restarting master process:", err)
+				}
+			*/
 		}
 		time.Sleep(5 * time.Second)
 	}

@@ -17,6 +17,14 @@ func DefaultHandler(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
+func HeathHandler(w http.ResponseWriter, _ *http.Request) {
+	_, err := w.Write([]byte("ok\n"))
+	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		return
+	}
+}
+
 func APIListHandler(w http.ResponseWriter, _ *http.Request) {
 	msg := "api list:\n"
 

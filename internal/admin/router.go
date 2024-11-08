@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"guardhouse/pkg/configkit"
 	"log"
 	"net/http"
 
@@ -8,8 +9,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-const DefaultAdminListen = "0.0.0.0:403"
 
 func RunServer() {
 	router := chi.NewRouter()
@@ -23,10 +22,10 @@ func RunServer() {
 	router.Handle("/html/*", http.StripPrefix("/html/", fileServer))
 
 	router.Get("/", DefaultHandler)
-	router.Get("/ping", DefaultHandler)
+	router.Get("/ping", HeathHandler)
+	router.Get("/health", HeathHandler)
 
 	router.Get("/internal", APIListHandler)
-	router.Get("/internal/", APIListHandler)
 
 	// Register metrics handler
 	router.Handle("/internal/noah/metrics", promhttp.Handler())
@@ -39,7 +38,7 @@ func RunServer() {
 	router.Get("/internal/noah/cmd", CmdExec)
 	router.Get("/internal/noah/exec", CmdExec)
 
-	addr := DefaultAdminListen
+	addr := configkit.AdminAddr
 
 	log.Printf("Starting admin server on %s", addr)
 

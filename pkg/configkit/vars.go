@@ -27,8 +27,13 @@ var (
 	// If agent count is more than 20K, suggest to set max sleep interval to 900s.
 	MaxSleepInterval = 300
 
+	// Linux
 	SystemdFilepath = "/etc/systemd/system/noah.service"
 	SystemdFilename = "noah.service"
+
+	// MacOS
+	LaunchctlFilepath = "/Library/LaunchDaemons/com.example.noah.plist"
+	LaunchctlFilename = "com.example.noah.plist"
 
 	TmpDir = "/tmp/noah/"
 
@@ -36,6 +41,7 @@ var (
 )
 
 var AdminApiList = []string{
+	"/heath",
 	"/internal/noah/host",
 	"/internal/noah/selfupdate",
 	"/internal/noah/selfupgrade",
@@ -121,7 +127,7 @@ func GetConfigURL() string {
 }
 
 func GetAdminHeathURL() string {
-	return "http://" + AdminAddr + "/internal/noah/heath"
+	return "http://" + AdminAddr + "/health"
 }
 
 func GetHostHeartbeatURL() string {
