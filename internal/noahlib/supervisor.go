@@ -1,7 +1,9 @@
 package noahlib
 
 import (
+	"guardhouse/pkg/configkit"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -112,7 +114,23 @@ func monitorMasterProcess(executable string) {
 func isMasterRunning() bool {
 	// Implement logic to check if master process is running
 	// This could be done by checking for a specific PID file or process name
-	return false
+
+	// check "noah:master" process is running or not by process name
+
+	// check `https://127.0.0.1:403/internal/noah/heath` is running or not.
+	resp, err := http.Get(configkit.GetAdminHeathURL())
+	if err != nil {
+		log.Println("Master process not running:", err)
+		return false
+	}
+
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotFound {
+		log.Println("Master process is running:", resp.StatusCode)
+		return true
+	} else {
+		log.Println("Master process is not running:", resp.StatusCode)
+		return false
+	}
 }
 
 func startMasterProcess(executable string) error {

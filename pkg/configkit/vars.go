@@ -31,6 +31,8 @@ var (
 	SystemdFilename = "noah.service"
 
 	TmpDir = "/tmp/noah/"
+
+	AdminAddr = "127.0.0.1:403"
 )
 
 var AdminApiList = []string{
@@ -116,6 +118,10 @@ func CheckPlugins(pluginDir string) map[string]string {
 
 func GetConfigURL() string {
 	return path.Join(DefaultDomain, "/host")
+}
+
+func GetAdminHeathURL() string {
+	return path.Join(AdminAddr, "/internal/noah/heath")
 }
 
 func GetHostHeartbeatURL() string {
