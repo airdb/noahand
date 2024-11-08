@@ -107,5 +107,6 @@ func InstallTarball() {
 	log.Println("Unzipped to", unzipPath)
 
 	// The runtime process cannot install directly.
-	InstallDirectory(unzipPath, configkit.ModulesDir)
+	modulesPath := path.Join(configkit.ModulesDir, md5)
+	InstallDirectory(unzipPath, modulesPath)
 }
