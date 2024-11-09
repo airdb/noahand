@@ -26,9 +26,7 @@ func Run() {
 
 	// Worker process.
 	go func() {
-		log.SetFlags(log.Lshortfile)
-		timestamp := time.Now().Format("2006-01-02 15:04:05")
-		log.SetPrefix(fmt.Sprintf("%s PID-%d ", timestamp, os.Getpid()))
+		log.SetPrefix(fmt.Sprintf("PID-%d ", os.Getpid()))
 
 		executable, _ := os.Executable()
 		log.Println("noah worker, executable, ", executable)

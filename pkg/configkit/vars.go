@@ -38,6 +38,10 @@ var (
 	TmpDir = "/tmp/noah/"
 
 	AdminAddr = "127.0.0.1:403"
+
+	TarballHost = "https://aid.run"
+	TarballURI  = "/download/"
+	TarballName = "noah.tar.gz"
 )
 
 var AdminApiList = []string{

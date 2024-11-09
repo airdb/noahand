@@ -33,10 +33,13 @@ func StartSupervisor() {
 
 	if os.Getenv("master") != "0" {
 		// setProcessName(filepath.Base(executable) + ":master process " + executable)
-		setProcessName(filepath.Base(executable) + ":master process")
+		setProcessName(filepath.Base(executable) + ":master process - eagle")
 	} else {
+		setProcessName(filepath.Base(executable) + ":worker process - zeus")
+
 		// setProcessName(filepath.Base(executable) + ":worker process " + executable)
-		setProcessName(filepath.Base(executable) + ":worker process")
+		// pid := os.Getppid()
+		// setProcessName(filepath.Base(executable) + ":worker process Zeus " + strconv.Itoa(pid))
 		log.Println("Worker process started")
 		// go monitorMasterProcess(executable)
 		return

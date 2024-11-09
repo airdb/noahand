@@ -1,12 +1,38 @@
-# Module 管理规范规范
+# Noah Modules 开发规范
+
+
+Module (Other deamon Agents) 是 Noah 系统的负责管理的其他系统 agent ，通过 Zeus 插件启动和管理。本文档介绍了 Module 的开发规范和最佳实践。
+
+
+## 限制规范
+
+资源与权限管理: 限制 CPU、内存使用量，并控制模块包大小，防止系统资源消耗过多。
 
 ## 文件规范
-
+- 包大小: 单个 module 包大小建议控制在 100MB 以内。 如果超过则不允许上传。
 - 只有可执行文件，才有x权限， 正常是755
 - 其他文件应该是只读的，正常是644
 - Agent module 单个 tarball 文件的大小应该在 100M 以内。 如果超过则不允许上传。
 
-## 内容规范
+
+
+## Module 开发结构
+
+目录结构:
+
+arduino
+Copy code
+modules/
+├── module_name/
+│   ├── main.go
+│   ├── config/
+│   ├── bin/
+│   └── README.md
+接口规范: 每个 module 必须实现健康检查、日志输出、状态反馈接口，便于 Zeus 管理。
+
+
+
+## 包管理规范
 
 和 deb 包类似， 我们
 
