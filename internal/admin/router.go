@@ -16,6 +16,9 @@ func RunServer() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
+	// Clean path.
+	router.Use(middleware.CleanPath)
+
 	// Routes
 	// Serve static files
 	fileServer := http.FileServer(http.Dir("./html"))

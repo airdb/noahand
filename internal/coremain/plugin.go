@@ -18,7 +18,11 @@ type PluginInterface interface {
 }
 
 func RunPlugin() {
+
 	log.Println("Running plugins...", configkit.PluginMap)
+
+	// Keep the plugin map up to date.
+	configkit.UpdatePluginMap()
 
 	for pluginPath, pluginName := range configkit.PluginMap {
 		// RunPluginWithParams(pluginPath, pluginName)

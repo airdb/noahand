@@ -126,6 +126,10 @@ func CheckPlugins(pluginDir string) map[string]string {
 	return PluginMap
 }
 
+func UpdatePluginMap() {
+	PluginMap = CheckPlugins(PluginDir)
+}
+
 func GetConfigURL() string {
 	return path.Join(DefaultDomain, "/host")
 }
