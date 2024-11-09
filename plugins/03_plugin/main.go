@@ -8,11 +8,29 @@ import (
 	"syscall"
 )
 
-// Main function of the plugin.
-func Plugin03() {
-	log.SetFlags(log.Lshortfile)
-	log.Println("Hello from Plugin 03!")
+type Plugin03 struct{}
 
+var Plugin = Plugin03{}
+
+func (p Plugin03) GetInfo() {
+	log.Println("Plugin03 version: v0.1.0")
+}
+
+func (p Plugin03) Init() {
+	log.Println("Init from Plugin 03!")
+}
+
+func (p Plugin03) Start() {
+	log.Println("Hello from Plugin 03!")
+	p.Execute()
+}
+
+func (p Plugin03) Stop() {
+	log.Println("Stop from Plugin 03!")
+}
+
+// Main function of the plugin.
+func (p Plugin03) Execute() {
 	// Create cgroup configuration
 	cgroupConfig := &exec.Cmd{
 		SysProcAttr: &syscall.SysProcAttr{},

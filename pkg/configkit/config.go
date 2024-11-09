@@ -17,6 +17,49 @@ type Config struct {
 
 var GlobalConfig Config
 
+const (
+	PluginStatusEnabled  = "enabled"
+	PluginStatusDisabled = "disabled"
+	PluginStatusUnknown  = "unknown"
+	PluginStatusFailed   = "failed"
+	PluginStatusOutdated = "outdated"
+
+	ModuleStatusEnabled  = "enabled"
+	ModuleStatusDisabled = "disabled"
+	ModuleStatusUnknown  = "unknown"
+	ModuleStatusFailed   = "failed"
+	ModuleStatusRunning  = "running"
+	ModuleStatusOutdated = "outdated"
+)
+
+type RuntimeConfig struct {
+	HomeDir   string `mapstructure:"home_dir" json:"home_dir"`
+	GOOS      string `mapstructure:"goos" json:"goos"`
+	GOARCH    string `mapstructure:"goarch" json:"goarch"`
+	Version   string `mapstructure:"version" json:"version"`
+	BuildInfo string `mapstructure:"build_info" json:"build_info"`
+}
+
+type MainConfig struct {
+	RunMode string `mapstructure:"run_mode" json:"run_mode"`
+}
+
+type PluginConfig struct {
+	PluginName     string `mapstructure:"plugin_name" json:"plugin_name"`
+	PluginPath     string `mapstructure:"plugin_path" json:"plugin_path"`
+	PluginVersion  string `mapstructure:"plugin_version" json:"plugin_version"`
+	PluginPriority int    `mapstructure:"plugin_priority" json:"plugin_priority"`
+	PluginStatus   string `mapstructure:"plugin_status" json:"plugin_status"`
+}
+
+type ModuleConfig struct {
+	ModuleName     string `mapstructure:"module_name" json:"module_name"`
+	ModulePath     string `mapstructure:"module_path" json:"module_path"`
+	ModuleVersion  string `mapstructure:"module_version" json:"module_version"`
+	ModulePriority int    `mapstructure:"module_priority" json:"module_priority"`
+	ModuleStatus   string `mapstructure:"module_status" json:"module_status"`
+}
+
 func Init() {
 	// log.Println("Load config ", CfgFile)
 	viper.SetConfigName(CfgFile)

@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"guardhouse/pkg/configkit"
 	"guardhouse/pkg/version"
 	"os"
 
@@ -68,6 +69,11 @@ to quickly create a Cobra application.`,
 func Execute() {
 	rootCmd.Version = version.ToString()
 	rootCmd.AddCommand(updateCmd)
+
+	// Init config First.
+	configkit.InitConfig()
+
+	// Init command
 	initRun()
 
 	if err := rootCmd.Execute(); err != nil {

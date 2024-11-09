@@ -8,10 +8,28 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-// Main function of the plugin.
-func Plugin02() {
-	log.SetFlags(log.Lshortfile)
+type Plugin02 struct{}
+
+var Plugin = Plugin02{}
+
+func (p Plugin02) GetInfo() {
+	log.Println("Plugin02 version: v0.1.0")
+}
+
+func (p Plugin02) Init() {
+	log.Println("Init from Plugin 02!")
+}
+
+func (p Plugin02) Start() {
 	log.Println("Hello from Plugin 02!")
+	p.Execute()
+}
+
+func (p Plugin02) Stop() {
+	log.Println("Stop from Plugin 02!")
+}
+
+func (p Plugin02) Execute() {
 	// Create a new resty client
 	client := resty.New()
 
