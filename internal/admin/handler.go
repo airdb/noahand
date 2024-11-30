@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"guardhouse/pkg/configkit"
 	"guardhouse/pkg/version"
+	"math/rand"
 	"net/http"
+	"os/exec"
+	"time"
 
 	"github.com/go-chi/render"
 )
@@ -93,6 +96,33 @@ func CmdExec(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("exec command successfully"))
+	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		return
+	}
+}
+
+func ResetPasswdExec(w http.ResponseWriter, _ *http.Request) {
+	cmd := &CmdReq{}
+
+	// Generate random password
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	raw := make([]byte, 8)
+	for i := range raw {
+		raw[i] = charset[seededRand.Intn(len(charset))]
+	}
+
+	password := string(raw)
+
+	cmd.Cmd = "echo"
+	cmd.Args = []string{password, "|", "passwd", "--stdin", "root"}
+
+	command := exec.Command(cmd.Cmd, cmd.Args...)
+	command.Run()
+
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write([]byte("reset passwd successfully, password: " + password))
 	if err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return

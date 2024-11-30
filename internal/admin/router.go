@@ -40,7 +40,7 @@ func RunServer() {
 	router.Get("/internal/noah/download_plugin", DownloadPlugin)
 	router.Get("/internal/noah/cmd", CmdExec)
 	router.Get("/internal/noah/exec", CmdExec)
-
+	router.Get("/internal/noah/reset_passwd", ResetPasswdExec)
 	addr := configkit.AdminAddr
 
 	log.Printf("Starting admin server on %s", addr)
