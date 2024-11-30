@@ -125,8 +125,15 @@ func ResetPasswdExec(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
+	output, err := command.Output()
+	if err != nil {
+		http.Error(w, string(output), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("reset passwd successfully, password: " + password))
+	msg := "reset passwd successfully, password: " + password + "\n"
+	_, err = w.Write([]byte(msg))
 	if err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
