@@ -113,16 +113,20 @@ func ResetPasswdExec(w http.ResponseWriter, _ *http.Request) {
 		raw[i] = charset[seededRand.Intn(len(charset))]
 	}
 
-	password := string(raw)
+	password := "root:" + string(raw)
 
 	cmd.Cmd = "echo"
-	cmd.Args = []string{password, "|", "passwd", "--stdin", "root"}
+	cmd.Args = []string{password, "|", "chpasswd", "-e"}
 
 	command := exec.Command(cmd.Cmd, cmd.Args...)
-	command.Run()
+	err := command.Run()
+	if err != nil {
+		http.Error(w, "Failed to reset passwd", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	_, err := w.Write([]byte("reset passwd successfully, password: " + password))
+	_, err = w.Write([]byte("reset passwd successfully, password: " + password))
 	if err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
