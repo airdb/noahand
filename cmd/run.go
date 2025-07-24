@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"guardhouse/internal/coremain"
+	"noahand/internal/coremain"
 
 	"github.com/spf13/cobra"
 )
@@ -24,8 +24,8 @@ import (
 // runCmd represents the run command.
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run GuardHouse Agent",
-	Long:  `Run GuardHouse Agent`,
+	Short: "Run noahand Agent",
+	Long:  `Run noahand Agent`,
 	Run: func(cmd *cobra.Command, args []string) {
 		coremain.Run()
 	},

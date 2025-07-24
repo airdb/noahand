@@ -1,10 +1,10 @@
 services:
-  guardhouse:
-    container_name: guardhouse
+  noahand:
+    container_name: noahand
     build:
       context: .
       dockerfile: Dockerfile
-    image: "airdb/guardhouse:latest"
+    image: "airdb/noahand:latest"
     #command: sleep 3600
     command: cp -pr /app/output /srv/output/ &&  echo "build complete"
     volumes:

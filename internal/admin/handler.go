@@ -2,8 +2,8 @@ package admin
 
 import (
 	"encoding/json"
-	"guardhouse/pkg/configkit"
-	"guardhouse/pkg/version"
+	"noahand/pkg/configkit"
+	"noahand/pkg/version"
 	"math/rand"
 	"net/http"
 	"os/exec"

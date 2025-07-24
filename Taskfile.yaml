@@ -15,10 +15,10 @@ vars:
   VERSION:
     sh: git describe --tags --always || echo "dev"
   LDFLAGS: >
-    -X guardhouse/pkg/version.BuildTime={{.BUILD_TIME}}
-    -X guardhouse/pkg/version.Repo={{.SERVICE}}
-    -X guardhouse/pkg/version.Version={{.VERSION}}
-    -X guardhouse/pkg/version.Build={{.GIT_COMMIT}}
+    -X noahand/pkg/version.BuildTime={{.BUILD_TIME}}
+    -X noahand/pkg/version.Repo={{.SERVICE}}
+    -X noahand/pkg/version.Version={{.VERSION}}
+    -X noahand/pkg/version.Build={{.GIT_COMMIT}}
 
 tasks:
   default:
@@ -40,22 +40,22 @@ tasks:
       - CGO_ENABLED=1 go build -buildmode=plugin -o output/plugins/04_plugin.so plugins/04_plugin/main.go
 
   run:
-    desc: Run guardhouse locally
+    desc: Run noahand locally
     cmds:
       - go run main.go
 
   build:
-    desc: Build guardhouse binary
+    desc: Build noahand binary
     cmds:
       - go build -ldflags "{{.LDFLAGS}}" -o output/noah main.go
 
   docker-build:
-    desc: Build guardhouse binary by docker
+    desc: Build noahand binary by docker
     cmds:
       - docker compose up --build
 
   run-plugin:
-    desc: Run guardhouse plugin mode
+    desc: Run noahand plugin mode
     cmds:
       - go run main.go plugin
 

@@ -1,7 +1,7 @@
 package configkit
 
 import (
-	"guardhouse/pkg/version"
+	"noahand/pkg/version"
 	"log"
 	"net"
 	"net/url"

@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"guardhouse/pkg/configkit"
+	"noahand/pkg/configkit"
 	"log"
 	"net/http"
 

@@ -1,7 +1,7 @@
 package noahlib
 
 import (
-	"guardhouse/pkg/configkit"
+	"noahand/pkg/configkit"
 	"log"
 	"math/rand"
 	"net/http"

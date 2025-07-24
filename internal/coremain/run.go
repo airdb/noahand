@@ -2,9 +2,9 @@ package coremain
 
 import (
 	"fmt"
-	"guardhouse/internal/admin"
-	"guardhouse/internal/noahlib"
-	"guardhouse/pkg/configkit"
+	"noahand/internal/admin"
+	"noahand/internal/noahlib"
+	"noahand/pkg/configkit"
 	"log"
 	"os"
 	"os/user"
