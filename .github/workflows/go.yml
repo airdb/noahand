@@ -1,35 +1,14 @@
 name: go
 on: [push]
 jobs:
-  build0:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v4  # 设置 Go 环境
-        with:
-          go-version: 1.24
-      - run: ls -la
-      - run: sudo bash ./build/build.bash setup
-      - run: sudo bash ./build/build.bash build
-      - run: sudo -E bash ./build/build.bash release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-  # 多平台构建
+  # Mutiple Platform Build
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         # 构建目标平台组合
         goos: [linux]
-        goarch: [amd64, aarch64]
+        goarch: [amd64, arm64]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,9 +18,7 @@ jobs:
         with:
           go-version: '1.24'
           cache: true
-
-      - name: Install Depends
-        run: go mod download
+      - run: go mod download
 
       - name: Build
         env:
@@ -50,11 +27,13 @@ jobs:
           # 输出文件名格式: 项目名-操作系统-架构
           OUTPUT_NAME: "noah-${{ matrix.goos }}-${{ matrix.goarch }}"
         run: |
-          # 根据操作系统添加扩展名
-          if [ "${{ matrix.goos }}" = "windows" ]; then
-            go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
+          if [ "${{ matrix.goos }}" == "windows" ]; then
+            echo ${{ matrix.goos }}_${{ matrix.goarch }}
+            #go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
           else
-            go build -v -o "output/${OUTPUT_NAME}" ./cmd/noah
+            #go build -v -o "output/${OUTPUT_NAME}" ./cmd/noah
+            echo ${{ matrix.goos }}_${{ matrix.goarch }}
+            GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -o "output/${OUTPUT_NAME}" main.go
           fi
 
       - name: Upload build files
