@@ -48,8 +48,6 @@ jobs:
           # 输出文件名格式: 项目名-操作系统-架构
           OUTPUT_NAME: "noah-${{ matrix.goos }}-${{ matrix.goarch }}"
         run: |
-          ls -ltr
-          go mod download
           # 根据操作系统添加扩展名
           if [ "${{ matrix.goos }}" = "windows" ]; then
             go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
