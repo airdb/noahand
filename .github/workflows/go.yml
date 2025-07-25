@@ -53,8 +53,8 @@ jobs:
             #go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
           else
             #go build -v -o "output/${OUTPUT_NAME}" ./cmd/noah
-            echo GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -o "output/${OUTPUT_NAME}_${{ matrix.goos }}_${{ matrix.goarch }} ./cmd/noahand
             echo ${{ matrix.goos }}_${{ matrix.goarch }}
+            GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -o "output/${OUTPUT_NAME}_${{ matrix.goos }}_${{ matrix.goarch }}" ./cmd/noahand
           fi
 
       - name: Upload build files
