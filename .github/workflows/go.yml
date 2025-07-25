@@ -1,35 +1,14 @@
 name: go
 on: [push]
 jobs:
-  build0:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v4  # 设置 Go 环境
-        with:
-          go-version: 1.24
-      - run: ls -la
-      - run: sudo bash ./build/build.bash setup
-      - run: sudo bash ./build/build.bash build
-      - run: sudo -E bash ./build/build.bash release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-  # 多平台构建
+  # Mutiple Platform Build
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         # 构建目标平台组合
         goos: [linux]
-        goarch: [amd64, arm64]
+        goarch: [amd64, aarch64]
 
     steps:
       - uses: actions/checkout@v4
