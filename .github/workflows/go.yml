@@ -48,12 +48,13 @@ jobs:
           # 输出文件名格式: 项目名-操作系统-架构
           OUTPUT_NAME: "noah-${{ matrix.goos }}-${{ matrix.goarch }}"
         run: |
-          # 根据操作系统添加扩展名
           if [ "${{ matrix.goos }}" = "windows" ]; then
-            go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
+            echo ${{ matrix.os }}_${{ matrix.arch }}
+            #go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
           else
             #go build -v -o "output/${OUTPUT_NAME}" ./cmd/noah
-            GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o "output/${OUTPUT_NAME}_${{ matrix.os }}_${{ matrix.arch }} ./cmd/noahand
+            #GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o "output/${OUTPUT_NAME}_${{ matrix.os }}_${{ matrix.arch }} ./cmd/noahand
+            echo ${{ matrix.os }}_${{ matrix.arch }}
           fi
 
       - name: Upload build files
