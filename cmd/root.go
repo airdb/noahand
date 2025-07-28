@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
-	"guardhouse/pkg/configkit"
-	"guardhouse/pkg/version"
+	"noahand/pkg/configkit"
+	"noahand/pkg/version"
 	"os"
 
 	"github.com/spf13/cobra"

@@ -2,7 +2,7 @@ package coremain
 
 import (
 	"fmt"
-	"guardhouse/pkg/configkit"
+	"noahand/pkg/configkit"
 	"log"
 	"plugin"
 )

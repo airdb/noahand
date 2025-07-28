@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"guardhouse/pkg/configkit"
+	"noahand/pkg/configkit"
 	"os"
 	"path/filepath"
 	"text/template"

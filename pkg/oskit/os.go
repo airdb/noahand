@@ -2,7 +2,7 @@ package oskit
 
 import (
 	"fmt"
-	"guardhouse/pkg/configkit"
+	"noahand/pkg/configkit"
 	"log"
 	"os"
 	"os/exec"

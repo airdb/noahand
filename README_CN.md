@@ -1,12 +1,12 @@
-# GuardHouse
+# noahand
 
 [中文版](README_CN.md) | [English](README.md)
 
 ## 1. 项目概述
 
-Guardhouse项目旨在为云服务器提供高效的集中管理解决方案，功能包括主机状态监控、任务分发、系统配置更新、异常防御等。项目采用Golang开发，结合anti-zero防御机制，确保系统的安全性与高可用性。Noah进程是一个运行在 linux 系统的deamon agent 进程，采用类似Nginx的Master/Worker设计模式，以Master主进程控制Worker进程，实现任务并发执行和动态管理。
+noahand项目旨在为云服务器提供高效的集中管理解决方案，功能包括主机状态监控、任务分发、系统配置更新、异常防御等。项目采用Golang开发，结合anti-zero防御机制，确保系统的安全性与高可用性。Noah进程是一个运行在 linux 系统的deamon agent 进程，采用类似Nginx的Master/Worker设计模式，以Master主进程控制Worker进程，实现任务并发执行和动态管理。
 
-- **项目名称**: GuardHouse
+- **项目名称**: noahand
 - **核心功能**:
   - 主机状态监控
   - 任务分发管理

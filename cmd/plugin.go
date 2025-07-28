@@ -5,8 +5,8 @@ More information, please vist https://airdb.team.
 package cmd
 
 import (
-	"guardhouse/internal/coremain"
-	"guardhouse/internal/sqlite"
+	"noahand/internal/coremain"
+	"noahand/internal/sqlite"
 
 	"github.com/spf13/cobra"
 )

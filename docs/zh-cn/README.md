@@ -1,11 +1,11 @@
-# Guardhouse
+# noahand
 
-Guardhouse 是一套主机 agent 管理的解决方案，Noah 是具体的项目实现。
+noahand 是一套主机 agent 管理的解决方案，Noah 是具体的项目实现。
 
 Noah (Agent Management) 系统开发与部署文档
 
 ## 概述
-项目名称: Noah（Guardhouse）
+项目名称: Noah（noahand）
 系统架构: Master/Worker 模式，Master 命名为 Eagle，Worker 命名为 Zeus。
 核心目标: 提供主机管理、插件扩展、任务分发、监控和健康检查等功能。
 

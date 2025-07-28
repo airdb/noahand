@@ -1,10 +1,10 @@
-# GuardHouse 🏰
+# noahand 🏰
 
 [中文版](README_CN.md) | [English](README.md)
 
 ## 1. Project Overview 🌟
 
-GuardHouse is an enterprise-level cloud server centralized management platform, providing comprehensive server management, monitoring, and security protection solutions.
+noahand is an enterprise-level cloud server centralized management platform, providing comprehensive server management, monitoring, and security protection solutions.
 
 ### 1.1 Core Features ⭐
 
@@ -144,7 +144,7 @@ The system adopts a layered architecture design, including the following core co
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/guardhouse.git
+git clone https://github.com/your-org/noahand.git
 
 # Build plugins and build noah
 task build-plugins build
@@ -159,5 +159,5 @@ For detailed configuration, please wait for the official documentation.
 
 ## 8. Community Contribution 🤝
 
-- Submit Issues: [GitHub Issues](https://github.com/your-org/guardhouse/issues) 🐛
+- Submit Issues: [GitHub Issues](https://github.com/your-org/noahand/issues) 🐛
 - Contribute Code: [Contributing Guide](CONTRIBUTING.md)

@@ -6,8 +6,8 @@ package cmd
 
 import (
 	"fmt"
-	"guardhouse/pkg/configkit"
-	"guardhouse/pkg/service"
+	"noahand/pkg/configkit"
+	"noahand/pkg/service"
 	"log"
 	"runtime"
 

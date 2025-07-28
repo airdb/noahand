@@ -1,7 +1,7 @@
 package main
 
 import (
-	"guardhouse/cmd"
+	"noahand/cmd"
 )
 
 func main() {

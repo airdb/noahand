@@ -2,7 +2,7 @@
 package main
 
 import (
-	"guardhouse/internal/noahlib"
+	"noahand/internal/noahlib"
 	"log"
 
 	"github.com/go-resty/resty/v2"

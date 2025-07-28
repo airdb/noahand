@@ -1,0 +1,66 @@
+name: go
+on: [push]
+jobs:
+  # Mutiple Platform Build
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 构建目标平台组合
+        goos: [linux]
+        goarch: [amd64, arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+      - run: go mod download
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          # 输出文件名格式: 项目名-操作系统-架构
+          OUTPUT_NAME: "noah-${{ matrix.goos }}-${{ matrix.goarch }}"
+        run: |
+          if [ "${{ matrix.goos }}" == "windows" ]; then
+            echo ${{ matrix.goos }}_${{ matrix.goarch }}
+            #go build -v -o "output/${OUTPUT_NAME}.exe" ./cmd/noah
+          else
+            #go build -v -o "output/${OUTPUT_NAME}" ./cmd/noah
+            echo ${{ matrix.goos }}_${{ matrix.goarch }}
+            GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -o "output/${OUTPUT_NAME}" main.go
+          fi
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: noah-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: output/
+          retention-days: 7  # 构建产物保留 7 天
+
+  # 发布到 GitHub Releases (仅在创建标签时触发)
+  release:
+    if: startsWith(github.ref, 'refs/tags/')  # 仅当推送标签时执行
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 下载所有构建产物
+        uses: actions/download-artifact@v4
+        with:
+          path: output/
+
+      - name: 显示构建产物结构
+        run: find output/
+
+      - name: 创建发布
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            output/**/noah-*
+          draft: false
+          prerelease: false

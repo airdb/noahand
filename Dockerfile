@@ -30,7 +30,7 @@ RUN CGO_ENABLED=1 go build -o output/main main.go &&\
 #
 ## Copy binary from builder
 #COPY --from=builder /app/main /app/main
-#COPY --from=builder /app/guardhouse /app/guardhouse
+#COPY --from=builder /app/noahand /app/noahand
 #
 ## Create output directory for plugins
 #RUN mkdir -p /app/output
