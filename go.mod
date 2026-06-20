@@ -3,7 +3,7 @@ module noahand
 go 1.24
 
 require (
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/go-chi/render v1.0.3
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/prometheus/client_golang v1.22.0
