@@ -1,0 +1,35 @@
+# test this file with
+#   goreleaser --skip-publish --rm-dist --config goreleaser.yml
+builds:
+  - env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - '7'
+nfpms:
+  - maintainer: "https://github.com/{{ .Env.GITHUB_USER }}"
+    formats:
+      - deb
+      - rpm
+      - apk
+archives:
+  - formats:
+      - zip
+    files:
+      - none*
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

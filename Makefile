@@ -44,3 +44,29 @@ $(PLATFORMS):
 .PHONY: release
 release: linux darwin
 	tar czvf release/$(BINARY)_latest.zip release/$(BINARY)-*
+
+up: ## Create and start containers
+	docker compose up -d --build --force-recreate
+build: ## Build or rebuild docker image
+	docker compose build --no-cache
+
+start: ## Start services
+	docker compose start
+
+stop: ## Stop services
+	docker compose stop
+
+restart: ## Restart containers
+	docker compose restart
+
+ps: ## List containers
+	docker compose ps
+
+log logs: ## View output from containers
+	docker compose logs
+
+rm: stop ## Stop and remove stopped service containers
+	docker compose rm ${SERVICE}
+
+bash: ## Execute a command in a running container
+	docker compose exec ${SERVICE} bash
