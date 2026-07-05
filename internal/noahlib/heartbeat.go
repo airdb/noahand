@@ -22,9 +22,11 @@ type HostHeartbeatReq struct {
 
 type HostHeartbeatResp struct{}
 
+var heartbeatClient = resty.New()
+
 func RandomHeartbeat() {
 	for {
-		t := rand.Intn(configkit.MaxSleepInterval)
+		t := 1 + rand.Intn(configkit.MaxSleepInterval)
 
 		log.Println("sleep time seed", t)
 
@@ -41,8 +43,6 @@ func RandomHeartbeat() {
 }
 
 func Heartbeat() {
-	client := resty.New()
-
 	req := &HostHeartbeatReq{
 		IP:          GetLocalIP(),
 		Hostname:    GetHostname(),
@@ -55,7 +55,7 @@ func Heartbeat() {
 
 	log.Printf("Heartbeat request: %+v", req)
 
-	resp, err := client.R().
+	resp, err := heartbeatClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(req).
 		Post(GetHostHeartbeatURL())

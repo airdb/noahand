@@ -12,25 +12,19 @@ import (
 )
 
 func Run() {
-	if !IsRuuserRoot() {
-		return
-	}
+	MustRunAsRoot()
 
 	configkit.InitConfig()
 
-	// Supervisor process.
+	// Supervisor (master) blocks in here forever; the worker returns and
+	// continues below.
 	noahlib.StartSupervisor()
 
 	go admin.RunServer()
-	time.Sleep(time.Second * 3)
 
 	// Worker process.
 	go func() {
 		log.SetPrefix(fmt.Sprintf("PID-%d ", os.Getpid()))
-
-		executable, _ := os.Executable()
-		log.Println("noah worker, executable, ", executable)
-		// noahlib.MonitorMasterProcess(executable)
 
 		for {
 			log.Println("plugin management")
@@ -44,19 +38,13 @@ func Run() {
 	noahlib.WaitWorkerSignals()
 }
 
-func IsRuuserRoot() bool {
-	// Check run user
+func MustRunAsRoot() {
 	runUser, err := user.Current()
 	if err != nil {
 		log.Fatalf("Failed to get current user: %v", err)
-		return false
 	}
 
-	if runUser.Uid == "0" {
-		return true
+	if runUser.Uid != "0" {
+		log.Fatalf("current user: %s, must run as root!", runUser.Username)
 	}
-
-	log.Fatalf("current user: %s, must run as root!\n", runUser.Username)
-
-	return false
 }

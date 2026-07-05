@@ -1,9 +1,7 @@
 package noahlib
 
 import (
-	"noahand/pkg/configkit"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -14,42 +12,45 @@ import (
 	"unsafe"
 )
 
+// setProcessName rewrites the memory backing argv[0] so the new name shows up
+// in ps/top. The kernel-provided buffer is only len(os.Args[0])+1 bytes, so a
+// longer name is truncated; writing past it would corrupt argv[1:]/environ.
 func setProcessName(name string) {
-	argv0 := (*[1 << 30]byte)(unsafe.Pointer(unsafe.StringData(os.Args[0])))[:len(name)+1]
+	argv0 := (*[1 << 20]byte)(unsafe.Pointer(unsafe.StringData(os.Args[0])))[: len(os.Args[0])+1 : len(os.Args[0])+1]
 
-	n := copy(argv0, name+"\x00")
-	if n < len(argv0) {
-		argv0[n] = 0
+	n := copy(argv0[:len(argv0)-1], name)
+	for i := n; i < len(argv0); i++ {
+		argv0[i] = 0
 	}
 }
 
 func StartSupervisor() {
 	executable, _ := os.Executable()
-	_ = os.Chdir(filepath.Base(executable))
+	_ = os.Chdir(filepath.Dir(executable))
 
-	// deep copy os.Args & os.Environ
+	// Deep copy os.Args and os.Environ: their strings point into the original
+	// argv/environ block, which setProcessName mutates below.
 	osArgs := strings.Split(strings.Join(os.Args, "\x00"), "\x00")
 	osEnviron := strings.Split(strings.Join(os.Environ(), "\x00")+"\x00master=0", "\x00")
 
-	if os.Getenv("master") != "0" {
-		// setProcessName(filepath.Base(executable) + ":master process " + executable)
-		setProcessName(filepath.Base(executable) + ":master process - eagle")
-	} else {
+	if os.Getenv("master") == "0" {
 		setProcessName(filepath.Base(executable) + ":worker process - zeus")
-
-		// setProcessName(filepath.Base(executable) + ":worker process " + executable)
-		// pid := os.Getppid()
-		// setProcessName(filepath.Base(executable) + ":worker process Zeus " + strconv.Itoa(pid))
 		log.Println("Worker process started")
-		// go monitorMasterProcess(executable)
 		return
 	}
 
-	var childs []*os.Process
+	setProcessName(filepath.Base(executable) + ":master process - eagle")
 
-	var supervisor func()
+	type workerExit struct {
+		proc    *os.Process
+		success bool
+	}
+	exited := make(chan workerExit, 8)
 
-	supervisor = func() {
+	// child is only accessed from the supervisor loop below, so no locking.
+	var child *os.Process
+
+	startWorker := func() {
 		log.Println("Starting worker process")
 		p, err := os.StartProcess(executable, osArgs, &os.ProcAttr{
 			Dir:   ".",
@@ -61,96 +62,67 @@ func StartSupervisor() {
 			return
 		}
 
-		for _, child := range childs {
-			_ = child.Signal(syscall.SIGHUP)
+		old := child
+		child = p
+		if old != nil {
+			_ = old.Signal(syscall.SIGHUP)
 		}
 
-		childs = append(childs[:0], p)
-
-		ps, err := p.Wait()
-		if err != nil {
-			log.Println("Process wait error:", err)
-		}
-
-		if ps != nil && !ps.Success() {
-			log.Println("Worker process exited with failure, restarting")
-			go supervisor()
-		}
+		go func() {
+			ps, err := p.Wait()
+			if err != nil {
+				log.Println("Process wait error:", err)
+			}
+			exited <- workerExit{proc: p, success: ps != nil && ps.Success()}
+		}()
 	}
 
-	go supervisor()
+	startWorker()
 	go RandomHeartbeat()
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGTERM)
-	signal.Notify(signalChan, syscall.SIGINT)
-	signal.Notify(signalChan, syscall.SIGHUP)
+	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
 
 	for {
-		switch sig := <-signalChan; sig {
-		case syscall.SIGTERM, syscall.SIGINT:
-			log.Println("Received signal:", sig)
-			for _, child := range childs {
-				_ = child.Signal(sig)
+		select {
+		case e := <-exited:
+			if e.proc != child {
+				// An old worker replaced during a SIGHUP reload; nothing to do.
+				continue
 			}
-			os.Exit(0)
-		case syscall.SIGHUP:
-			log.Println("Received SIGHUP, starting worker")
-			go supervisor()
-		}
-	}
-}
-
-func MonitorMasterProcess(executable string) {
-	for {
-		if !isMasterRunning() {
-			log.Println("Master process not running, restarting")
-			/*
-				err := startMasterProcess(executable)
-				if err != nil {
-					log.Println("Error restarting master process:", err)
+			child = nil
+			if e.success {
+				log.Println("Worker process exited normally, not restarting")
+				continue
+			}
+			log.Println("Worker process exited with failure, restarting")
+			time.Sleep(time.Second) // avoid a tight fork loop when the worker crashes at startup
+			startWorker()
+		case sig := <-signalChan:
+			switch sig {
+			case syscall.SIGHUP:
+				log.Println("Received SIGHUP, starting worker")
+				startWorker()
+			default:
+				log.Println("Received signal:", sig)
+				if child != nil {
+					_ = child.Signal(sig)
+					timeout := time.After(10 * time.Second)
+					for waiting := true; waiting; {
+						select {
+						case e := <-exited:
+							waiting = e.proc != child
+						case <-timeout:
+							log.Println("Worker did not exit in time, killing")
+							_ = child.Kill()
+							waiting = false
+						}
+					}
 				}
-			*/
+				os.Exit(0)
+			}
 		}
-		time.Sleep(5 * time.Second)
 	}
-}
-
-func isMasterRunning() bool {
-	// Implement logic to check if master process is running
-	// This could be done by checking for a specific PID file or process name
-
-	// check "noah:master" process is running or not by process name
-
-	// check `https://127.0.0.1:403/internal/noah/heath` is running or not.
-	resp, err := http.Get(configkit.GetAdminHeathURL())
-	if err != nil {
-		log.Println("Master process not running:", err)
-		return false
-	}
-
-	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotFound {
-		log.Println("Master process is running:", resp.StatusCode)
-		return true
-	} else {
-		log.Println("Master process is not running:", resp.StatusCode)
-		return false
-	}
-}
-
-func startMasterProcess(executable string) error {
-	setProcessName(filepath.Base(executable) + ":master process")
-
-	p, err := os.StartProcess(executable, os.Args, &os.ProcAttr{
-		Dir:   ".",
-		Env:   os.Environ(),
-		Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
-	})
-	if err != nil {
-		return err
-	}
-	_, err = p.Wait()
-	return err
 }
 
 var (
@@ -173,34 +145,40 @@ func RegisterGraceSignals(f func()) {
 	globalGraceFuncs = append(globalGraceFuncs, f)
 }
 
+func registeredFuncs() (exitFuncs, graceFuncs []func()) {
+	globalMu.Lock()
+	defer globalMu.Unlock()
+
+	return append([]func(){}, globalExitFuncs...), append([]func(){}, globalGraceFuncs...)
+}
+
 func WaitWorkerSignals() {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGTERM)
-	signal.Notify(c, syscall.SIGINT)
-	signal.Notify(c, syscall.SIGHUP)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
 
-	switch <-c {
+	sig := <-c
+	exitFuncs, graceFuncs := registeredFuncs()
+
+	switch sig {
 	case syscall.SIGTERM, syscall.SIGINT:
-		log.Println("worker received exited signal")
+		log.Println("worker received exit signal")
 
-		for _, f := range globalExitFuncs {
+		for _, f := range exitFuncs {
 			f()
 		}
 
-		for _, f := range globalGraceFuncs {
+		for _, f := range graceFuncs {
+			f()
+		}
+	case syscall.SIGHUP:
+		executable, _ := os.Executable()
+		setProcessName(filepath.Base(executable) + ":worker (grace)")
+		log.Println("worker start graceful shutdown")
+
+		for _, f := range graceFuncs {
 			f()
 		}
 
-		return
+		log.Println("worker end graceful shutdown")
 	}
-
-	executable, _ := os.Executable()
-	setProcessName(filepath.Base(executable) + ": worker process (graceful shutdown)")
-	log.Println("worker start graceful shutdown")
-
-	for _, f := range globalGraceFuncs {
-		f()
-	}
-
-	log.Println("worker end graceful shutdown")
 }
