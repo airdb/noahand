@@ -1,163 +1,70 @@
-# noahand 🏰
+# noahand
 
-[中文版](README_CN.md) | [English](README.md)
+[English](README.md) | [中文版](README_CN.md)
 
-## 1. Project Overview 🌟
+**noahand** (Noah) is a lightweight Linux host agent for centralized cloud-server management. It runs as a daemon with an Nginx-style master/worker process model — the master process (**Eagle**) supervises and restarts the worker process (**Zeus**), which executes tasks and loads plugins.
 
-noahand is an enterprise-level cloud server centralized management platform, providing comprehensive server management, monitoring, and security protection solutions.
+## Features
 
-### 1.1 Core Features ⭐
+- **Master/Worker supervision** — Eagle forks Zeus, restarts it on crash, and forwards `SIGTERM` / `SIGINT` / `SIGHUP` for graceful shutdown and reload
+- **Heartbeat reporting** — periodically reports host info (IP, hostname, arch, OS, kernel) to a central server at randomized intervals to avoid thundering herds
+- **Local admin API** — a chi-based HTTP interface on `127.0.0.1:403` for health checks, runtime config, host info, and self-update
+- **Prometheus metrics** — exposed at `/internal/noah/metrics`
+- **Plugin system** — extensible via Go plugins (`.so`), loaded dynamically at runtime
+- **Service integration** — `noah init` generates a systemd unit file (Linux); launchd (macOS) is also supported
 
-- **Unified Management Platform** 🎯
-  - Centralized Control Console
-  - Real-time Monitoring Dashboard
-  - Visual Operations Interface
+## Requirements
 
-- **Intelligent Operations** 🤖
-  - Automated Task Orchestration
-  - Smart Fault Diagnosis
-  - Predictive Maintenance
+- Go 1.26+
+- Linux (primary target; macOS supported for development)
+- Root privileges to run the agent
 
-- **Security Protection** 🛡️
-  - anti-zero Defense System
-  - Multi-layer Security Architecture
-  - Real-time Threat Detection
-
-### 1.2 Technical Architecture 🏗️
-
-- **Backend Stack** 💻
-  - Core Language: Go 1.20+
-  - Microservice Framework: gRPC
-  - Message Queue: Kafka/RabbitMQ
-
-- **Monitoring System** 📊
-  - Monitoring Engine: Prometheus
-  - Visualization: Grafana
-  - Log Processing: ELK Stack
-
-## 2. System Architecture 🔨
-
-The system adopts a layered architecture design, including the following core components:
-
-### 2.1 Core Components 🧩
-
-- **Master Service** 👑
-  - Central Management Unit
-  - Responsible for Heartbeat Monitoring, Task Scheduling, and Problem Diagnosis
-  
-- **Noah Agent** 🤖
-  - Master/Worker Architecture
-  - Deployed on Each Cloud Host Node
-  - Handles Local Task Execution and Monitoring
-
-- **Worker Plugin System** 🔌
-  - Pluggable Design
-  - Supports Automatic Inspection and System Management
-  - Provides Flexible Configuration Options
-
-### 2.2 Monitoring System 📈
-
-- Prometheus Integration
-- Grafana Data Visualization
-- Real-time Data Collection and Analysis
-
-## 3. Core Functions ⚙️
-
-### 3.1 Master Service 🎮
-
-- **Management Interface**: Port 403 for Local Management
-- **Heartbeat Detection**: 300s Random Interval to Reduce System Load
-- **Worker Management**: Automatic Fault Detection and Recovery
-- **Security Protection**: anti-zero Defense, Anomaly Detection
-
-### 3.2 Noah Agent 🚀
-
-- **Main Process Management**: Task Scheduling, Plugin Management
-- **Worker Process**: Executes Specific Tasks
-- **Plugin Types**:
-  - Automatic Inspection Plugins
-  - System Configuration Management Plugins
-  - Scheduled Task Plugins
-
-## 4. Technical Features 🔧
-
-### 4.1 High-Performance Design ⚡
-
-- **Concurrent Processing**
-  - Go Goroutine-based High Concurrency Model
-  - Adaptive Load Balancing
-  - Task Queue Optimization
-
-- **Resource Scheduling** 📊
-  - Intelligent Resource Allocation
-  - Dynamic Scaling
-  - Task Priority Management
-
-### 4.2 Security Mechanisms 🔐
-
-- TLS Encrypted Communication
-- Certificate Authentication
-- anti-zero Defense
-- Port Access Control
-
-### 4.3 Scalability 📈
-
-- Plugin Architecture
-- Dynamic Loading Mechanism
-- Cluster Deployment Support
-
-## 5. Deployment & Maintenance 🚀
-
-### 5.1 Deployment Solutions
-
-- Noah as System Service
-- Load Balancer Configuration
-
-### 5.2 Monitoring Metrics 📊
-
-- Heartbeat Frequency Statistics
-- Task Execution Status
-- System Resource Utilization
-
-## 6. Development Guide 👨‍💻
-
-### 6.1 Plugin Development 🔌
-
-- Standard Interface Specifications
-- Development Templates
-- Test Cases
-
-### 6.2 System Extensions 🛠️
-
-- Custom Monitoring Metrics
-- Alert Rule Configuration
-- Task Orchestration
-
-## 7. Quick Start 🚀
-
-### 7.1 Requirements 📋
-
-- Go 1.20+
-- Linux Kernel 4.19+
-
-### 7.2 Installation & Deployment 🔧
+## Quick Start
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/noahand.git
+git clone https://github.com/airdb/noahand.git
+cd noahand
 
-# Build plugins and build noah
-task build-plugins build
+# Build plugins and the noah binary (requires go-task)
+task build-plugin build
 
-# Run
-./noah run
+# Run the agent (requires root)
+sudo ./output/noah run
 ```
 
-### 7.3 Configuration ⚙️
+## CLI Commands
 
-For detailed configuration, please wait for the official documentation.
+| Command | Description |
+| --- | --- |
+| `noah run` | Start the agent (Eagle/Zeus supervisor, admin API, plugin loop) |
+| `noah init` | Generate a systemd service file |
+| `noah plugin` | Run in plugin mode (load and execute plugins once) |
+| `noah update` | Self-update (stub, not yet implemented) |
 
-## 8. Community Contribution 🤝
+To install as a system service:
 
-- Submit Issues: [GitHub Issues](https://github.com/your-org/noahand/issues) 🐛
-- Contribute Code: [Contributing Guide](CONTRIBUTING.md)
+```bash
+noah init
+sudo systemctl daemon-reload
+sudo systemctl start noah
+sudo systemctl enable noah
+sudo journalctl -u noah -f   # view logs
+```
+
+## Documentation
+
+Detailed documentation (in Chinese) lives in [docs/zh-cn/](docs/zh-cn/README.md):
+
+- [Architecture](docs/zh-cn/architecture.md) — Eagle/Zeus process model, heartbeat, admin API, path conventions, deployment
+- [Configuration](docs/zh-cn/config.md) — config file design and fields
+- [Plugin Development](docs/zh-cn/noah-plugin.md) — how to write a Zeus plugin (`.so`)
+- [Module Development](docs/zh-cn/noah-module.md) — module packaging and installation spec
+
+## Contributing
+
+Issues and pull requests are welcome: [GitHub Issues](https://github.com/airdb/noahand/issues)
+
+## License
+
+[Apache License 2.0](LICENSE)

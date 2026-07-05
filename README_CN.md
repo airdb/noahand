@@ -1,113 +1,70 @@
 # noahand
 
-[中文版](README_CN.md) | [English](README.md)
+[English](README.md) | [中文版](README_CN.md)
 
-## 1. 项目概述
+**noahand**（Noah）是一个轻量级的 Linux 主机 agent，用于云服务器的集中管理。它以守护进程方式运行，采用类似 Nginx 的 Master/Worker 进程模型 —— Master 进程（**Eagle**）负责监督和拉起 Worker 进程（**Zeus**），Zeus 负责执行任务和加载插件。
 
-noahand项目旨在为云服务器提供高效的集中管理解决方案，功能包括主机状态监控、任务分发、系统配置更新、异常防御等。项目采用Golang开发，结合anti-zero防御机制，确保系统的安全性与高可用性。Noah进程是一个运行在 linux 系统的deamon agent 进程，采用类似Nginx的Master/Worker设计模式，以Master主进程控制Worker进程，实现任务并发执行和动态管理。
+## 功能特性
 
-- **项目名称**: noahand
-- **核心功能**:
-  - 主机状态监控
-  - 任务分发管理
-  - 系统配置更新
-  - 异常防御机制
-  
-- **技术特点**:
-  - 基于 Golang 开发
-  - 集成 anti-zero 防御机制
-  - Noah Agent 采用 Master/Worker 架构(类似 Nginx 风格)
+- **Master/Worker 进程监督** —— Eagle fork 出 Zeus，崩溃时自动重启，并转发 `SIGTERM` / `SIGINT` / `SIGHUP` 信号实现优雅退出和重载
+- **心跳上报** —— 以随机间隔向中心服务上报主机信息（IP、主机名、架构、操作系统、内核版本），避免上报洪峰
+- **本地管理接口** —— 基于 chi 的 HTTP 接口，监听 `127.0.0.1:403`，提供健康检查、运行时配置、主机信息、自更新等能力
+- **Prometheus 指标** —— 通过 `/internal/noah/metrics` 暴露
+- **插件体系** —— 通过 Go plugin（`.so`）扩展，运行时动态加载
+- **服务化集成** —— `noah init` 生成 systemd unit 文件（Linux）；同时支持 macOS launchd
 
-## 2. 系统架构
+## 环境要求
 
-系统采用分层架构设计，主要包含以下核心组件：
+- Go 1.26+
+- Linux（主要目标平台；macOS 可用于开发）
+- 运行 agent 需要 root 权限
 
-### 2.1 核心组件
+## 快速开始
 
-- **Master 服务**
-  - 中央管理单元
-  - 负责心跳监控、任务调度和问题诊断
-  
-- **Noah Agent**
-  - 采用 Master/Worker 架构
-  - 部署于各个云主机节点
-  - 负责本地任务执行和监控
+```bash
+# 克隆仓库
+git clone https://github.com/airdb/noahand.git
+cd noahand
 
-- **Worker 插件系统**
-  - 可插拔式设计
-  - 支持自动巡检、系统管理等功能
-  - 提供灵活的配置选项
+# 构建插件和 noah 二进制（需要 go-task）
+task build-plugin build
 
-### 2.2 监控体系
+# 运行 agent（需要 root）
+sudo ./output/noah run
+```
 
-- 集成 Prometheus 监控
-- Grafana 数据可视化
-- 实时数据采集和分析
+## 命令行
 
-## 3. 核心功能
+| 命令 | 说明 |
+| --- | --- |
+| `noah run` | 启动 agent（Eagle/Zeus 监督进程、管理接口、插件循环） |
+| `noah init` | 生成 systemd 服务文件 |
+| `noah plugin` | 插件模式（加载并执行一次插件） |
+| `noah update` | 自更新（占位，尚未实现） |
 
-### 3.1 Master 服务
+安装为系统服务：
 
-- **管理接口**: 403 端口，提供本地管理功能
-- **心跳检测**: 300s 随机间隔，降低系统压力
-- **Worker 管理**: 自动故障检测和恢复
-- **安全防护**: anti-zero 防御，异常检测
+```bash
+noah init
+sudo systemctl daemon-reload
+sudo systemctl start noah
+sudo systemctl enable noah
+sudo journalctl -u noah -f   # 查看日志
+```
 
-### 3.2 Noah Agent
+## 文档
 
-- **主进程管理**: 任务调度、插件管理
-- **Worker 进程**: 执行具体任务
-- **插件类型**:
-  - 自动巡检插件
-  - 系统配置管理插件
-  - 定时任务插件
+详细文档见 [docs/zh-cn/](docs/zh-cn/README.md)：
 
-## 4. 技术特性
+- [系统架构](docs/zh-cn/architecture.md) —— Eagle/Zeus 进程模型、心跳机制、管理接口、路径约定、部署
+- [配置说明](docs/zh-cn/config.md) —— 配置文件设计与字段
+- [插件开发](docs/zh-cn/noah-plugin.md) —— 如何编写 Zeus 插件（`.so`）
+- [模块开发](docs/zh-cn/noah-module.md) —— 模块打包与安装规范
 
-### 4.1 高性能设计
+## 参与贡献
 
-- Golang 协程并发模型
-- 随机化心跳机制
-- 分布式任务处理
+欢迎提交 Issue 和 Pull Request：[GitHub Issues](https://github.com/airdb/noahand/issues)
 
-### 4.2 安全机制
+## 许可证
 
-- TLS 加密通信
-- 证书认证
-- anti-zero 防御
-- 端口访问控制
-
-### 4.3 可扩展性
-
-- 插件化架构
-- 动态加载机制
-- 集群化部署支持
-
-## 5. 部署与维护
-
-### 5.1 部署方案
-
-- Noah 作为系统服务
-- 负载均衡配置
-
-### 5.2 监控指标
-
-- 心跳频率统计
-- 任务执行状态
-- 系统资源使用率
-
-## 6. 开发指南
-
-### 6.1 插件开发
-
-- 标准接口规范
-- 开发模板
-- 测试用例
-
-### 6.2 系统扩展
-
-- 自定义监控指标
-- 告警规则配置
-- 任务编排
-
-[English Documentation](README.md)
+[Apache License 2.0](LICENSE)
